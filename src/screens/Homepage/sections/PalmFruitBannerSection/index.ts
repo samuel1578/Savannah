@@ -1,0 +1,1 @@
+export { PalmFruitBannerSection } from "./PalmFruitBannerSection";
