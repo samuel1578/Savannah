@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export const CallToActionSection = (): JSX.Element => {
     return (
@@ -11,13 +12,13 @@ export const CallToActionSection = (): JSX.Element => {
                 </h2>
 
                 {/* Link */}
-                <a
-                    href="#schedule"
+                <Link
+                    to="/contact"
                     className="[font-family:'Raleway',Helvetica] text-xs sm:text-sm font-semibold uppercase tracking-wider text-qi124qodeinteractivecomrangoon-green cta-button luxury-link"
                 >
                     Schedule a Visit
                     <span className="text-[#a8a7a7] arrow-line">——</span>
-                </a>
+                </Link>
 
             </div>
         </section>

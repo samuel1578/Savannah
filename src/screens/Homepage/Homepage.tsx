@@ -463,16 +463,6 @@ export const Homepage = (): JSX.Element => {
           },
         });
 
-        // Previous section exits attention (fades and desaturates slightly)
-        if (communityBanner) {
-          ctaTl.to(communityBanner, {
-            opacity: 0.3,
-            scale: prefersReducedMotion ? 1 : 0.98,
-            duration: 1.0,
-            ease: "power2.out",
-          }, 0);
-        }
-
         // Headline reveals line by line / smoothly
         ctaTl.fromTo(
           ctaHeadline,

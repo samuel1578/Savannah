@@ -1,6 +1,6 @@
 import React from "react";
 import heritageImage from "../../../../assets/heritage.jpg";
-import luxuryImage from "../../../../assets/luxury.png";
+import luxuryImage from "../../../../assets/fixeda.jpg";
 
 export const HeritageExperienceSection = (): JSX.Element => {
     return (

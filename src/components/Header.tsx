@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export const Header = ({ onMenuOpen }: HeaderProps): JSX.Element => {
     return (
-        <header className="fixed top-0 left-0 w-full h-[85px] flex items-center justify-between px-6 sm:px-10 lg:px-14 z-50 bg-transparent transition-all duration-500">
+        <header className="fixed top-0 left-0 w-full h-[85px] flex items-center justify-between px-6 sm:px-10 lg:px-14 z-50 bg-black/15 backdrop-blur-xl border-b border-white/5 transition-all duration-500">
             {/* Logo */}
             <div className="flex items-center">
                 <img

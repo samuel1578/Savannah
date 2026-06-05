@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import logoLight from "../assets/logo-light.png";
 
 interface MenuOverlayProps {
@@ -41,13 +42,13 @@ export const MenuOverlay = ({ isOpen, onClose, activeSection }: MenuOverlayProps
 
                 {/* Left Column: Navigation Links */}
                 <nav className="flex flex-col gap-3 sm:gap-4 lg:gap-6 text-[56px] sm:text-[72px] lg:text-[96px] xl:text-[112px] lowercase font-light leading-[1.05] tracking-tight [font-family:'Cormorant_Unicase',Helvetica] w-full lg:w-auto text-left pl-0 sm:pl-8 lg:pl-0">
-                    <a
-                        href="#app"
+                    <Link
+                        to="/"
                         onClick={onClose}
                         className={`hover:opacity-100 transition-opacity duration-300 ${activeSection === "home" ? "opacity-100 font-normal" : "opacity-35"}`}
                     >
                         home
-                    </a>
+                    </Link>
                     <a
                         href="#read-more-heritage"
                         onClick={onClose}
@@ -55,20 +56,20 @@ export const MenuOverlay = ({ isOpen, onClose, activeSection }: MenuOverlayProps
                     >
                         about
                     </a>
-                    <a
-                        href="#reviews"
+                    <Link
+                        to="/blog"
                         onClick={onClose}
                         className={`hover:opacity-100 transition-opacity duration-300 ${activeSection === "blog" ? "opacity-100 font-normal" : "opacity-35"}`}
                     >
                         blog
-                    </a>
-                    <a
-                        href="#schedule"
+                    </Link>
+                    <Link
+                        to="/contact"
                         onClick={onClose}
                         className={`hover:opacity-100 transition-opacity duration-300 ${activeSection === "contact" ? "opacity-100 font-normal" : "opacity-35"}`}
                     >
                         contact
-                    </a>
+                    </Link>
                 </nav>
 
                 {/* Right Column: Logo & Content */}
@@ -91,13 +92,13 @@ export const MenuOverlay = ({ isOpen, onClose, activeSection }: MenuOverlayProps
                             Luxury Hydration Experience<br />
                             Available Worldwide
                         </p>
-                        <a
-                            href="#discover"
+                        <Link
+                            to="/contact"
                             onClick={onClose}
                             className="inline-block [font-family:'Cormorant_Unicase',Helvetica] text-2xl sm:text-3xl lg:text-[38px] font-light text-white hover:opacity-75 transition-opacity mt-6 border-b border-white pb-1"
                         >
                             Visit us
-                        </a>
+                        </Link>
                     </div>
                 </div>
 

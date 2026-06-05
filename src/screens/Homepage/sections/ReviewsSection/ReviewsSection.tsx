@@ -1,5 +1,5 @@
 import React from "react";
-import reviewsImage from "../../../../assets/reviews.jpg";
+import reviewsImage from "../../../../assets/fixedb.jpg";
 
 export const ReviewsSection = (): JSX.Element => {
     return (

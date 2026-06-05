@@ -1,11 +1,13 @@
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
+import { Link } from "react-router-dom";
 import logoLight from "../../../../assets/logo-light.png";
 
 const navLinks = [
-  { label: "Home", href: "https://qi124.qodeinteractive.com/" },
-  { label: "About", href: "https://qi124.qodeinteractive.com/about/" },
-  { label: "Contact", href: "https://qi124.qodeinteractive.com/contact/" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/#read-more-heritage" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const FooterBrandInviteSection = (): JSX.Element => {
@@ -49,15 +51,13 @@ export const FooterBrandInviteSection = (): JSX.Element => {
           className="flex items-center justify-center gap-12 sm:gap-16 lg:gap-24 mb-16"
         >
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
-              rel="noopener noreferrer"
-              target="_blank"
+              to={link.href}
               className="[font-family:'Raleway',Helvetica] text-sm sm:text-base font-medium tracking-[1px] text-[#d2d2d2] hover:text-white transition-colors footer-nav-link"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
