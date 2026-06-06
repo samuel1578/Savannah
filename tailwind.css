@@ -369,3 +369,77 @@ header.header-scrolled {
   -webkit-backdrop-filter: blur(12px) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
+
+/* Form underline implemented with a pseudo-element to avoid duplicate lines */
+label.form-field {
+  position: relative;
+  --underline-width: 0%;
+}
+
+label.form-field::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.25rem;
+  /* align slightly under input text */
+  height: 1px;
+  width: var(--underline-width, 0%);
+  background-color: #d7d7d7;
+  display: block;
+}
+
+/* Subtle focus state when interacting with the field */
+label.form-field:focus-within::after {
+  background-color: #242514;
+}
+
+/* Underline transition and hover/focus refinement */
+label.form-field::after {
+  transition: width 360ms cubic-bezier(.2, .8, .2, 1), background-color 320ms ease;
+}
+
+/* Hospitality image hover: gentle scale up */
+.hospitality-wrap .hospitality-image {
+  transition: transform 0.7s cubic-bezier(.2, .7, .2, 1);
+  transform-origin: center center;
+}
+
+.hospitality-wrap:hover .hospitality-image {
+  transform: scale(1.03);
+}
+
+/* Submit button subtle text movement and underline */
+.submit-ghost {
+  position: relative;
+  overflow: visible;
+}
+
+.submit-ghost::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  width: 0%;
+  background-color: currentColor;
+  transition: width 320ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.submit-ghost:hover {
+  transform: translateY(-2px);
+  transition: transform 250ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.submit-ghost:hover::after {
+  width: 100%;
+}
+
+/* Newsletter focus underline deepen (footer) */
+label.newsletter-field::after {
+  transition: background-color 300ms ease, width 320ms ease;
+}
+
+label.newsletter-field:focus-within::after {
+  background-color: #242514;
+}
