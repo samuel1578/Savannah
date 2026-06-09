@@ -1,7 +1,11 @@
 import React from "react";
 import farmsImage from "../../../../assets/farms.png";
 
-export const OurFarmsSection = (): JSX.Element => {
+interface OurFarmsSectionProps {
+    image?: string;
+}
+
+export const OurFarmsSection = ({ image = farmsImage }: OurFarmsSectionProps): JSX.Element => {
     return (
         <a
             href="#our-farms"
@@ -9,7 +13,7 @@ export const OurFarmsSection = (): JSX.Element => {
         >
             {/* Full-bleed background image with scale effect on hover */}
             <img
-                src={farmsImage}
+                src={image}
                 alt="Our Farms"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-103 reveal-image farm-image"
             />

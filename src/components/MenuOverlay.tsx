@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import logoLight from "../assets/logo-light.png";
 
@@ -49,13 +49,13 @@ export const MenuOverlay = ({ isOpen, onClose, activeSection }: MenuOverlayProps
                     >
                         home
                     </Link>
-                    <a
-                        href="#read-more-heritage"
+                    <Link
+                        to="/about"
                         onClick={onClose}
                         className={`hover:opacity-100 transition-opacity duration-300 ${activeSection === "about" ? "opacity-100 font-normal" : "opacity-35"}`}
                     >
                         about
-                    </a>
+                    </Link>
                     <Link
                         to="/blog"
                         onClick={onClose}
