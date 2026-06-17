@@ -11,4 +11,13 @@ export default defineConfig({
       plugins: [tailwind()],
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://savannahdrinks.co.uk",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

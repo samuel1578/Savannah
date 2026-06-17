@@ -2,6 +2,7 @@ import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Link } from "react-router-dom";
 import logoLight from "../../../../assets/logo-light.png";
+import { HomepageSection } from "../../../../services/homepageCmsService";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -10,7 +11,18 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-export const FooterBrandInviteSection = (): JSX.Element => {
+interface FooterBrandInviteSectionProps {
+  data?: HomepageSection;
+}
+
+export const FooterBrandInviteSection = ({ data }: FooterBrandInviteSectionProps): JSX.Element => {
+  const getField = (key: string, fallback: string) => {
+    return data?.fields.find(f => f.key === key)?.value || fallback;
+  };
+
+  const newsletterPlaceholder = getField("newsletter_placeholder", "Your E-mail");
+  const newsletterButtonText = getField("newsletter_button_text", "Send");
+
   return (
     <footer className="relative w-full bg-qi124qodeinteractivecomouter-space text-white py-20 px-6 sm:px-10 lg:px-14 reveal-section">
       <div className="mx-auto flex flex-col items-center justify-center max-w-[793px] text-center">
@@ -27,13 +39,13 @@ export const FooterBrandInviteSection = (): JSX.Element => {
         {/* Email Form */}
         <form className="mb-14 flex w-full max-w-[580px] items-end gap-4 border-b border-[#a8a7a7]/40 pb-[4px] mx-auto footer-form">
           <label htmlFor="footer-email" className="sr-only">
-            Your E-mail
+            {newsletterPlaceholder}
           </label>
           <Input
             id="footer-email"
             type="email"
             defaultValue=""
-            placeholder="Your E-mail"
+            placeholder={newsletterPlaceholder}
             className="h-8 flex-1 rounded-none border-0 bg-transparent px-[5px] py-0 [font-family:'Raleway',Helvetica] text-sm tracking-[1px] text-[#d2d2d2] shadow-none placeholder:text-qi124qodeinteractivecomsilver-chalice/60 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           <Button
@@ -41,7 +53,7 @@ export const FooterBrandInviteSection = (): JSX.Element => {
             variant="ghost"
             className="h-auto rounded-none px-0 pb-0 pt-0 [font-family:'Raleway',Helvetica] text-xs sm:text-sm font-semibold tracking-[2px] uppercase text-white hover:bg-transparent hover:text-white/80 transition-opacity"
           >
-            Send
+            {newsletterButtonText}
           </Button>
         </form>
 

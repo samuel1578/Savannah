@@ -1,15 +1,29 @@
 import React from "react";
 import watermakingImage from "../../../../assets/watermaking.png";
+import { HomepageSection } from "../../../../services/homepageCmsService";
 
-export const WatermakingProcessSection = (): JSX.Element => {
+interface WatermakingProcessSectionProps {
+    data?: HomepageSection;
+}
+
+export const WatermakingProcessSection = ({ data }: WatermakingProcessSectionProps): JSX.Element => {
+    // Helper to get field value
+    const getField = (key: string, fallback: string) => {
+        return data?.fields.find(f => f.key === key)?.value || fallback;
+    };
+
+    const chapterMarker = data?.chapter_marker || "03 — Experience";
+    const label = getField("watermaking_label", "WATERMAKING PROCESS");
+    const url = getField("watermaking_url", "#watermaking-process");
+
     return (
         <a
-            href="#watermaking-process"
+            href={url}
             className="group relative block w-full h-[280px] sm:h-[350px] lg:h-[450px] bg-[#1c1c16] overflow-hidden flex items-end cursor-pointer reveal-section lifestyle-banner"
         >
             {/* Understated discovered Chapter Marker */}
             <div className="absolute top-8 right-6 sm:right-10 lg:right-14 [font-family:'Raleway',Helvetica] text-[10px] sm:text-xs font-semibold uppercase tracking-[3px] text-white/30 select-none pointer-events-none z-20">
-                03 — Experience
+                {chapterMarker}
             </div>
             {/* Full-bleed background image with scale effect on hover */}
             <img
@@ -23,7 +37,7 @@ export const WatermakingProcessSection = (): JSX.Element => {
 
             <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 pb-8 sm:px-10 sm:pb-12 lg:px-14 lg:pb-16">
                 <span className="[font-family:'Cormorant_Unicase',Helvetica] text-xl sm:text-2xl lg:text-3xl font-light tracking-[2px] text-[#fbfbfb] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
-                    WATERMAKING PROCESS
+                    {label}
                 </span>
             </div>
         </a>

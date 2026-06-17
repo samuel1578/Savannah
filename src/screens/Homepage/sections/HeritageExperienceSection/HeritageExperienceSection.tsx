@@ -1,8 +1,33 @@
 import React from "react";
 import heritageImage from "../../../../assets/heritage.jpg";
 import luxuryImage from "../../../../assets/fixeda.jpg";
+import { HeritageStory } from "../../../../services/homepageCmsService";
 
-export const HeritageExperienceSection = (): JSX.Element => {
+interface HeritageExperienceSectionProps {
+    stories?: HeritageStory[];
+}
+
+export const HeritageExperienceSection = ({ stories = [] }: HeritageExperienceSectionProps): JSX.Element => {
+    // Default content if stories are missing
+    const defaultStories = [
+        {
+            category_tag: "Heritage Process / Savannah Water",
+            title: "FROM PALM FRUIT\nTO PREMIUM\nHYDRATION",
+            description: "Discover how Ghana's smoked palm fruit tradition inspired the creation of Savannah Water — a refined modern beverage rooted in culture, craftsmanship, and wellness.",
+            link_text: "Read More",
+            link_url: "#read-more-heritage"
+        },
+        {
+            category_tag: "Luxury Experiences / Savannah Water",
+            title: "INSIDE THE\nSAVANNAH\nEXPERIENCE",
+            description: "Explore the vision behind Savannah Water through private tastings, hospitality partnerships, and immersive conversations with our founder.",
+            link_text: "Read More",
+            link_url: "#read-more-experience"
+        }
+    ];
+
+    const displayStories = stories.length >= 2 ? stories : defaultStories;
+
     return (
         <section className="relative w-full bg-qi-12-4qodeinteractivecomwhite py-16 px-6 sm:px-10 lg:px-14 reveal-section heritage-section">
             <div className="mx-auto w-full max-w-[1280px]">
@@ -21,27 +46,25 @@ export const HeritageExperienceSection = (): JSX.Element => {
 
                         {/* Category / Source */}
                         <span className="[font-family:'Raleway',Helvetica] text-xs font-semibold tracking-wider text-[#a8a7a7] uppercase mb-3">
-                            Heritage Process / Savannah Water
+                            {displayStories[0].category_tag}
                         </span>
 
                         {/* Title */}
-                        <h3 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl sm:text-4xl lg:text-[42px] font-light leading-[1.1] tracking-[-1px] text-qi124qodeinteractivecomrangoon-green mb-4">
-                            FROM PALM FRUIT<br />
-                            TO PREMIUM<br />
-                            HYDRATION
+                        <h3 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl sm:text-4xl lg:text-[42px] font-light leading-[1.1] tracking-[-1px] text-qi124qodeinteractivecomrangoon-green mb-4 whitespace-pre-line">
+                            {displayStories[0].title}
                         </h3>
 
                         {/* Description */}
                         <p className="[font-family:'Raleway',Helvetica] text-sm sm:text-base leading-[26px] text-qi124qodeinteractivecomrangoon-green/80 mb-6 max-w-[480px]">
-                            Discover how Ghana's smoked palm fruit tradition inspired the creation of Savannah Water — a refined modern beverage rooted in culture, craftsmanship, and wellness.
+                            {displayStories[0].description}
                         </p>
 
                         {/* Link */}
                         <a
-                            href="#read-more-heritage"
+                            href={displayStories[0].link_url}
                             className="[font-family:'Raleway',Helvetica] text-xs sm:text-sm font-semibold uppercase tracking-wider text-qi124qodeinteractivecomrangoon-green mt-auto luxury-link"
                         >
-                            Read More
+                            {displayStories[0].link_text}
                             <span className="text-[#a8a7a7] arrow-line">——</span>
                         </a>
                     </div>
@@ -59,27 +82,25 @@ export const HeritageExperienceSection = (): JSX.Element => {
 
                         {/* Category / Source */}
                         <span className="[font-family:'Raleway',Helvetica] text-xs font-semibold tracking-wider text-[#a8a7a7] uppercase mb-3">
-                            Luxury Experiences / Savannah Water
+                            {displayStories[1].category_tag}
                         </span>
 
                         {/* Title */}
-                        <h3 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl sm:text-4xl lg:text-[42px] font-light leading-[1.1] tracking-[-1px] text-qi124qodeinteractivecomrangoon-green mb-4">
-                            INSIDE THE<br />
-                            SAVANNAH<br />
-                            EXPERIENCE
+                        <h3 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl sm:text-4xl lg:text-[42px] font-light leading-[1.1] tracking-[-1px] text-qi124qodeinteractivecomrangoon-green mb-4 whitespace-pre-line">
+                            {displayStories[1].title}
                         </h3>
 
                         {/* Description */}
                         <p className="[font-family:'Raleway',Helvetica] text-sm sm:text-base leading-[26px] text-qi124qodeinteractivecomrangoon-green/80 mb-6 max-w-[480px]">
-                            Explore the vision behind Savannah Water through private tastings, hospitality partnerships, and immersive conversations with our founder.
+                            {displayStories[1].description}
                         </p>
 
                         {/* Link */}
                         <a
-                            href="#read-more-experience"
+                            href={displayStories[1].link_url}
                             className="[font-family:'Raleway',Helvetica] text-xs sm:text-sm font-semibold uppercase tracking-wider text-qi124qodeinteractivecomrangoon-green mt-auto luxury-link"
                         >
-                            Read More
+                            {displayStories[1].link_text}
                             <span className="text-[#a8a7a7] arrow-line">——</span>
                         </a>
                     </div>

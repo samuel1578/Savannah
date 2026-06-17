@@ -2,59 +2,74 @@ import heroImage from "../../../../assets/hero.jpeg";
 import sImage from "../../../../assets/s.jpg";
 import reserveImage from "../../../../assets/reserve.png";
 import dailyImage from "../../../../assets/daily.png";
+import { HomepageSection, HomepageProduct } from "../../../../services/homepageCmsService";
 
-const storyTitleLines = ["every", "bottle", "tells a", "story"];
+interface BrandStoryHeroSectionProps {
+  data?: HomepageSection;
+  products?: HomepageProduct[];
+}
 
-const productSections = [
-  {
-    title: "savannah reserve",
-    description:
-      "Crafted for luxury lounges, fine dining spaces, boutique hotels, and elevated experiences. Savannah Reserve delivers smoked palm fruit–infused hydration in a refined glass bottle designed to complement premium environments with elegance and distinction",
-    image: reserveImage,
-    imageClassName:
-      "h-[260px] w-auto rotate-[-14deg] object-contain sm:h-[320px] lg:h-[420px]",
-    specs: [
-      {
-        label: "Audience:",
-        value: "luxury hotels & fine dining",
-      },
-      {
-        label: "Experience:",
-        value: "refined, smoky, sophisticated hydration.",
-      },
-      {
-        label: "Notes:",
-        value:
-          "Crafted for premium hospitality, executive lounges, curated dining experiences, and luxury lifestyle environments.",
-      },
-    ],
-  },
-  {
-    title: "savannah daily",
-    description:
-      "Made for everyday movement, convenience, and refreshment on the go. Savannah Daily brings the same signature smoked palm fruit essence in a lightweight, practical bottle perfect for work, travel, fitness, and daily hydration.",
-    image: dailyImage,
-    imageClassName:
-      "h-[240px] w-auto rotate-[12deg] object-contain sm:h-[300px] lg:h-[380px]",
-    specs: [
-      {
-        label: "Audience:",
-        value: "modern everyday consumers",
-      },
-      {
-        label: "Lifestytle:",
-        value: "active, convenient, refreshing hydration.",
-      },
-      {
-        label: "Notes:",
-        value:
-          "Designed for workdays, fitness, travel, commuting, and health-conscious consumers seeking flavorful hydration daily.",
-      },
-    ],
-  },
-];
+export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSectionProps): JSX.Element => {
+  // Helper to get field value
+  const getField = (key: string, fallback: string) => {
+    return data?.fields.find(f => f.key === key)?.value || fallback;
+  };
 
-export const BrandStoryHeroSection = (): JSX.Element => {
+  const chapterMarker = data?.chapter_marker || "01 — Story";
+  const storyTitleLines = [
+    getField("hero_headline_line_1", "every"),
+    getField("hero_headline_line_2", "bottle"),
+    getField("hero_headline_line_3", "tells a"),
+    getField("hero_headline_line_4", "story"),
+  ];
+
+  const inspirationTitle = getField("hero_inspiration_title", "mama anita");
+  const inspirationTag = getField("hero_inspiration_tag", "Inspiration");
+  const inspirationBody = getField("hero_inspiration_body", "Savannah Water was inspired by the strength, warmth, and resilience of Mama Annita — a woman whose spirit reflected the richness of tradition and the beauty of authenticity. Her legacy lives on through every bottle, reminding us that true refinement begins at the source.");
+
+  // Map products to local structure while keeping images hardcoded
+  const displayProducts = products.map(p => {
+    const isReserve = p.product_key.includes("reserve");
+    return {
+      title: p.title,
+      description: p.description,
+      image: isReserve ? reserveImage : dailyImage,
+      imageClassName: isReserve
+        ? "h-[260px] w-auto rotate-[-14deg] object-contain sm:h-[320px] lg:h-[420px]"
+        : "h-[240px] w-auto rotate-[12deg] object-contain sm:h-[300px] lg:h-[380px]",
+      specs: p.specifications.map(s => ({
+        label: s.spec_label,
+        value: s.spec_value
+      }))
+    };
+  });
+
+  // Fallback if no products from CMS
+  const productSections = displayProducts.length > 0 ? displayProducts : [
+    {
+      title: "savannah reserve",
+      description: "Crafted for luxury lounges, fine dining spaces, boutique hotels, and elevated experiences. Savannah Reserve delivers smoked palm fruit–infused hydration in a refined glass bottle designed to complement premium environments with elegance and distinction",
+      image: reserveImage,
+      imageClassName: "h-[260px] w-auto rotate-[-14deg] object-contain sm:h-[320px] lg:h-[420px]",
+      specs: [
+        { label: "Audience:", value: "luxury hotels & fine dining" },
+        { label: "Experience:", value: "refined, smoky, sophisticated hydration." },
+        { label: "Notes:", value: "Crafted for premium hospitality, executive lounges, curated dining experiences, and luxury lifestyle environments." },
+      ],
+    },
+    {
+      title: "savannah daily",
+      description: "Made for everyday movement, convenience, and refreshment on the go. Savannah Daily brings the same signature smoked palm fruit essence in a lightweight, practical bottle perfect for work, travel, fitness, and daily hydration.",
+      image: dailyImage,
+      imageClassName: "h-[240px] w-auto rotate-[12deg] object-contain sm:h-[300px] lg:h-[380px]",
+      specs: [
+        { label: "Audience:", value: "modern everyday consumers" },
+        { label: "Lifestytle:", value: "active, convenient, refreshing hydration." },
+        { label: "Notes:", value: "Designed for workdays, fitness, travel, commuting, and health-conscious consumers seeking flavorful hydration daily." },
+      ],
+    },
+  ];
+
   return (
     <section className="relative w-full bg-qi-12-4qodeinteractivecomalabaster">
       <div className="mx-auto flex w-full max-w-[1920px] flex-col">
@@ -63,7 +78,7 @@ export const BrandStoryHeroSection = (): JSX.Element => {
         <div className="relative w-full h-[680px] sm:h-[800px] xl:h-[1200px] bg-[#fafafa] overflow-hidden">
           {/* Understated discovered Chapter Marker */}
           <div className="absolute top-24 right-6 sm:right-10 lg:right-14 [font-family:'Raleway',Helvetica] text-[10px] sm:text-xs font-semibold uppercase tracking-[3px] text-[#242514]/30 select-none pointer-events-none z-20">
-            01 — Story
+            {chapterMarker}
           </div>
 
           {/* Luxury Ambient Light Overlay */}
@@ -82,10 +97,9 @@ export const BrandStoryHeroSection = (): JSX.Element => {
 
             {/* Heading: every bottle tells a story */}
             <h1 className="absolute left-[866px] top-[270px] w-[381px] h-[569px] font-qi124-qodeinteractive-com-semantic-heading-1-lower text-[140px] font-light leading-[100px] tracking-[-4px] text-[#242514] hero-headline">
-              <span className="block hero-headline-line">every</span>
-              <span className="block hero-headline-line">bottle</span>
-              <span className="block hero-headline-line">tells a</span>
-              <span className="block hero-headline-line">story</span>
+              {storyTitleLines.map((line, idx) => (
+                <span key={`desktop-line-${idx}`} className="block hero-headline-line">{line}</span>
+              ))}
             </h1>
 
             {/* s.jpg image - Increased Height & Top Alignment */}
@@ -96,20 +110,17 @@ export const BrandStoryHeroSection = (): JSX.Element => {
 
             {/* Text wrapper */}
             <p className="absolute left-[1436px] top-[804px] w-[299px] [font-family:'Raleway',Helvetica] text-base font-normal leading-[25px] text-[#242514] hero-story-card">
-              Savannah Water was inspired by the strength, warmth, and resilience of
-              Mama Annita — a woman whose spirit reflected the richness of tradition
-              and the beauty of authenticity. Her legacy lives on through every
-              bottle, reminding us that true refinement begins at the source.
+              {inspirationBody}
             </p>
 
             {/* heading-luigi */}
             <div className="absolute left-[1388px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[70px] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card">
-              mama anita
+              {inspirationTitle}
             </div>
 
             {/* Inspiration */}
             <div className="absolute left-[1395px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card">
-              Inspiration
+              {inspirationTag}
             </div>
           </div>
 
@@ -128,8 +139,8 @@ export const BrandStoryHeroSection = (): JSX.Element => {
             <div className="flex-1 flex flex-col lg:flex-row px-6 py-10 sm:px-10 lg:px-14 lg:py-16 justify-between gap-10 overflow-y-auto">
               <div className="flex-1 max-w-[450px]">
                 <h1 className="font-qi124-qodeinteractive-com-semantic-heading-1-lower text-[64px] sm:text-[80px] lg:text-[95px] font-light leading-[0.85] tracking-[-4px] text-[#242514] hero-headline">
-                  {storyTitleLines.map((line) => (
-                    <span key={line} className="block hero-headline-line">
+                  {storyTitleLines.map((line, idx) => (
+                    <span key={`mobile-line-${idx}`} className="block hero-headline-line">
                       {line}
                     </span>
                   ))}
@@ -143,17 +154,13 @@ export const BrandStoryHeroSection = (): JSX.Element => {
                 />
                 <div className="space-y-4">
                   <p className="[font-family:'Raleway',Helvetica] text-sm leading-[25px] text-[#242514] sm:text-base">
-                    Savannah Water was inspired by the strength, warmth, and
-                    resilience of Mama Annita — a woman whose spirit reflected
-                    the richness of tradition and the beauty of authenticity.
-                    Her legacy lives on through every bottle, reminding us that
-                    true refinement begins at the source.
+                    {inspirationBody}
                   </p>
                   <div className="[font-family:'Cormorant_Unicase',Helvetica] text-[42px] font-medium leading-[0.9] tracking-[-2px] text-[#242514] sm:text-[54px]">
-                    mama anita
+                    {inspirationTitle}
                   </div>
                   <p className="font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514]">
-                    Inspiration
+                    {inspirationTag}
                   </p>
                 </div>
               </div>
@@ -165,7 +172,7 @@ export const BrandStoryHeroSection = (): JSX.Element => {
         {/* Product Sections (Savannah Reserve, Savannah Daily) */}
         <div className="flex flex-col gap-12 px-6 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-16">
           {productSections.map((section) => {
-            const isReserve = section.title.includes("reserve");
+            const isReserve = section.title.toLowerCase().includes("reserve");
             const sectionClass = isReserve ? "product-section-reserve" : "product-section-daily";
             return (
               <article

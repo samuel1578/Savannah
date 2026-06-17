@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -14,12 +14,22 @@ import { OurFarmsSection } from "./sections/OurFarmsSection";
 import { ReviewsSection } from "./sections/ReviewsSection";
 import { CallToActionSection } from "./sections/CallToActionSection";
 import { FooterBrandInviteSection } from "./sections/FooterBrandInviteSection";
+import { useHomepageCms } from "../../hooks/useHomepageCms";
 
 export const Homepage = (): JSX.Element => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const { homepageSections, products, heritageStories, loading, error } = useHomepageCms();
+
+  // Helper to get section data by key
+  const getSectionData = useMemo(() => (key: string) => {
+    return homepageSections.find(s => s.section_key === key);
+  }, [homepageSections]);
 
   useEffect(() => {
+    // Only initialize animations if not loading and no error
+    if (loading || error) return;
+
     // Register ScrollTrigger plugin
     gsap.registerPlugin(ScrollTrigger);
 
@@ -687,37 +697,71 @@ export const Homepage = (): JSX.Element => {
       gsap.ticker.remove(update);
       lenis.destroy();
     };
-  }, []);
+  }, [loading, error]); // Re-run when loading or error state changes
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-qi124qodeinteractivecomrangoon-green"></div>
+          <p className="mt-4 [font-family:'Raleway',Helvetica] text-sm font-medium tracking-[2px] uppercase text-qi124qodeinteractivecomrangoon-green">
+            Loading Savannah Experience...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
+        <div className="max-w-md">
+          <h2 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl text-qi124qodeinteractivecomrangoon-green">
+            Something went wrong
+          </h2>
+          <p className="mt-4 [font-family:'Raleway',Helvetica] text-qi124qodeinteractivecomrangoon-green/70">
+            {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-8 [font-family:'Raleway',Helvetica] text-sm font-semibold uppercase tracking-wider text-qi124qodeinteractivecomrangoon-green underline"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="relative w-full bg-white flex flex-col">
       <Header onMenuOpen={() => setIsMenuOpen(true)} />
       <section className="w-full">
-        <BrandStoryHeroSection />
+        <BrandStoryHeroSection data={getSectionData("hero_story")} products={products} />
       </section>
       <section className="w-full">
-        <MapOriginSection />
+        <MapOriginSection data={getSectionData("map_origin")} />
       </section>
       <section className="w-full">
-        <PalmFruitBannerSection />
+        <PalmFruitBannerSection data={getSectionData("palm_selection")} />
       </section>
       <section className="w-full">
-        <HeritageExperienceSection />
+        <HeritageExperienceSection stories={heritageStories} />
       </section>
       <section className="w-full">
-        <WatermakingProcessSection />
+        <WatermakingProcessSection data={getSectionData("watermaking")} />
       </section>
       <section className="w-full">
-        <OurFarmsSection />
+        <OurFarmsSection data={getSectionData("farms_banner")} />
       </section>
       <section className="w-full">
-        <ReviewsSection />
+        <ReviewsSection data={getSectionData("reviews_banner")} />
       </section>
       <section className="w-full">
-        <CallToActionSection />
+        <CallToActionSection data={getSectionData("cta_section")} />
       </section>
       <section className="w-full">
-        <FooterBrandInviteSection />
+        <FooterBrandInviteSection data={getSectionData("footer_invite")} />
       </section>
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} activeSection={activeSection} />
     </main>

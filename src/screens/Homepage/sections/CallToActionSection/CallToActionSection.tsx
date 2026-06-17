@@ -1,22 +1,36 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { HomepageSection } from "../../../../services/homepageCmsService";
 
-export const CallToActionSection = (): JSX.Element => {
+interface CallToActionSectionProps {
+    data?: HomepageSection;
+}
+
+export const CallToActionSection = ({ data }: CallToActionSectionProps): JSX.Element => {
+    // Helper to get field value
+    const getField = (key: string, fallback: string) => {
+        return data?.fields.find(f => f.key === key)?.value || fallback;
+    };
+
+    const headline = getField("cta_headline", "EXPERIENCE SAVANNAH WATER BEYOND THE BOTTLE. VISIT US OR CONNECT WITH OUR CEO.");
+    const buttonText = getField("cta_button_text", "Schedule a Visit");
+    const buttonLink = getField("cta_button_link", "/contact");
+
     return (
         <section className="relative w-full bg-qi-12-4qodeinteractivecomwhite py-24 px-6 sm:px-10 lg:px-14 text-center reveal-section cta-section">
             <div className="mx-auto w-full max-w-[850px] flex flex-col items-center justify-center">
 
                 {/* Title */}
                 <h2 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl sm:text-4xl lg:text-[45px] font-light leading-[1.15] tracking-[-1px] text-qi124qodeinteractivecomrangoon-green mb-8 uppercase max-w-[720px] cta-headline">
-                    EXPERIENCE SAVANNAH WATER BEYOND THE BOTTLE. VISIT US OR CONNECT WITH OUR CEO.
+                    {headline}
                 </h2>
 
                 {/* Link */}
                 <Link
-                    to="/contact"
+                    to={buttonLink}
                     className="[font-family:'Raleway',Helvetica] text-xs sm:text-sm font-semibold uppercase tracking-wider text-qi124qodeinteractivecomrangoon-green cta-button luxury-link"
                 >
-                    Schedule a Visit
+                    {buttonText}
                     <span className="text-[#a8a7a7] arrow-line">——</span>
                 </Link>
 
