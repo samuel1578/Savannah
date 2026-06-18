@@ -87,6 +87,23 @@ export const useHomepageCms = () => {
         }
     };
 
+    // Save product changes
+    const saveProduct = async (product: Partial<HomepageProduct> & { id: number }) => {
+        setSaving(true);
+        try {
+            const response = await homepageCmsService.updateProductData(product);
+            if (response.success) {
+                await fetchHomepageData();
+            }
+            return response;
+        } catch (err) {
+            console.error(`Error saving product ${product.id}:`, err);
+            throw err;
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return {
         homepageSections,
         products,
@@ -99,5 +116,6 @@ export const useHomepageCms = () => {
         refreshHomepageData: fetchHomepageData,
         saving,
         saveSection,
+        saveProduct,
     };
 };

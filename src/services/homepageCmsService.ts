@@ -156,6 +156,28 @@ class HomepageCmsService {
             throw new Error("SERVER_UNAVAILABLE");
         }
     }
+
+    /**
+     * Update a specific product's text content and specifications
+     */
+    async updateProductData(product: Partial<HomepageProduct> & { id: number }): Promise<UpdateSectionResponse> {
+        const productApiBase = "https://savannahdrinks.co.uk/api/products";
+        try {
+            const response = await authService.secureFetch(`${productApiBase}/update-products.php`, {
+                method: "POST",
+                body: JSON.stringify(product),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error(`Error updating product ${product.id} data:`, error);
+            throw new Error("SERVER_UNAVAILABLE");
+        }
+    }
 }
 
 export const homepageCmsService = new HomepageCmsService();

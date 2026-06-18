@@ -64,7 +64,7 @@ class AuthService {
     /**
      * Helper to perform authenticated/CSRF-protected fetch requests
      */
-    private async secureFetch(
+    public async secureFetch(
         url: string,
         options: RequestInit = {}
     ): Promise<Response> {

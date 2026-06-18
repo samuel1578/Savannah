@@ -22,28 +22,74 @@ try {
 
     $db = Database::getInstance()->getConnection();
 
+    $db->beginTransaction();
+
+    // Update product text fields
     $stmt = $db->prepare("
         UPDATE homepage_products
         SET
-            product_name = ?,
-            product_subtitle = ?,
-            product_description = ?,
+            title = ?,
+            description = ?,
             updated_at = NOW()
         WHERE id = ?
     ");
 
     $stmt->execute([
-        $input['product_name'] ?? '',
-        $input['product_subtitle'] ?? '',
-        $input['product_description'] ?? '',
+        $input['title'] ?? '',
+        $input['description'] ?? '',
         $productId
     ]);
 
+    // Update specifications
+    if (
+        isset($input['specifications']) &&
+        is_array($input['specifications'])
+    ) {
+
+        $deleteStmt = $db->prepare("
+            DELETE FROM homepage_product_specs
+            WHERE product_id = ?
+        ");
+
+        $deleteStmt->execute([$productId]);
+
+        $insertStmt = $db->prepare("
+            INSERT INTO homepage_product_specs
+            (
+                product_id,
+                spec_label,
+                spec_value,
+                display_order
+            )
+            VALUES (?, ?, ?, ?)
+        ");
+
+        foreach ($input['specifications'] as $index => $spec) {
+
+            $insertStmt->execute([
+                $productId,
+                $spec['spec_label'] ?? '',
+                $spec['spec_value'] ?? '',
+                $index
+            ]);
+        }
+    }
+
+    $db->commit();
+
     echo json_encode([
-        'success' => true
+        'success' => true,
+        'message' => 'Product updated successfully'
     ]);
 
 } catch (Throwable $e) {
+
+    if (
+        isset($db) &&
+        $db->inTransaction()
+    ) {
+        $db->rollBack();
+    }
 
     http_response_code(500);
 
