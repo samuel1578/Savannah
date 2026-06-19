@@ -8,6 +8,8 @@ import { MenuOverlay } from "../../components/MenuOverlay";
 import { OurFarmsSection } from "../Homepage/sections/OurFarmsSection";
 import { FooterBrandInviteSection } from "../Homepage/sections/FooterBrandInviteSection";
 import { SignatureCollectionsSection } from "./SignatureCollectionsSection";
+import { useAboutPageCms } from "../../hooks/useAboutPageCms";
+import { useHomepageCms } from "../../hooks/useHomepageCms";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
@@ -25,7 +27,11 @@ import storyGoldenSpice from "../../assets/heritage.jpg";
 import storyManWorkshop from "../../assets/story-man-workshop-interior.jpeg";
 import storyTeamTasting from "../../assets/story-team-tasting-labcoats.jpg";
 
-export const HeroSection = (): JSX.Element => {
+export const HeroSection = ({ data }: { data?: any }): JSX.Element => {
+    const headline1 = data?.hero_title || "the savannah";
+    const headline2 = ""; // Assuming title contains everything or we split it
+    const description = data?.hero_subtitle || "Inspired by heritage, crafted with passion, and shared with the world.";
+
     return (
         <div className="relative w-full min-h-[500px] sm:min-h-[600px] lg:min-h-[700px] flex items-center justify-center overflow-hidden hero-section reveal-section">
             <img
@@ -36,18 +42,18 @@ export const HeroSection = (): JSX.Element => {
             <div className="absolute inset-0 bg-black/30" />
             <div className="relative z-10 text-center px-6">
                 <h1 className="[font-family:'Cormorant_Unicase',Helvetica] text-[48px] sm:text-[72px] lg:text-[95px] font-light tracking-[-4px] text-white leading-none lowercase mb-4 hero-headline">
-                    <span className="hero-headline-line block">the savannah</span>
-                    <span className="hero-headline-line block">story</span>
+                    <span className="hero-headline-line block">{headline1}</span>
+                    <span className="hero-headline-line block">{headline2}</span>
                 </h1>
                 <p className="[font-family:'Raleway',Helvetica] text-sm sm:text-base lg:text-lg text-white/90 max-w-[600px] mx-auto leading-relaxed hero-story-card">
-                    Inspired by heritage, crafted with passion, and shared with the world.
+                    {description}
                 </p>
             </div>
         </div>
     );
 };
 
-export const OurStorySection = (): JSX.Element => {
+export const OurStorySection = ({ timeline }: { timeline: any[] }): JSX.Element => {
     const sectionHeadingStyle: React.CSSProperties = {
         width: "100%",
         textAlign: "center",
@@ -70,6 +76,9 @@ export const OurStorySection = (): JSX.Element => {
         boxSizing: "border-box",
     };
 
+    // Map images to timeline entries based on index or key if needed
+    const images = [storyWomanCooking, storyMotherChild, storyChildDoorway, storyGoldenSpice];
+
     return (
         <div className="relative w-full bg-white our-story-section">
             {/* Section heading "our story" */}
@@ -79,175 +88,53 @@ export const OurStorySection = (): JSX.Element => {
 
             {/* Story section container (section2) */}
             <div className="section2" style={section2Style}>
-                {/* Row 1 (2002) */}
-                <div className="relative flex flex-col md:flex-row items-center justify-between w-full mb-24 md:mb-32 story-row reveal-section">
-                    {/* Left: Image */}
-                    <div className="w-full md:w-[45%] aspect-[4/3] md:aspect-auto md:h-[429px] overflow-hidden relative">
-                        <img
-                            src={storyWomanCooking}
-                            alt="Rooted in Modest Beginnings"
-                            className="w-full h-full object-cover reveal-image"
-                        />
-                    </div>
-
-                    {/* Center: Spine Column */}
-                    <div className="hidden md:flex relative flex-col items-center justify-center w-[120px] self-stretch">
-                        <div className="absolute top-0 bottom-0 w-[1px] bg-[#cbcbcb]" />
-                        <div
-                            className="absolute w-[26.9px] h-[26.9px] bg-white border-[1.5px] border-[#cbcbcb] rotate-45 rounded-[25px]"
-                            style={{ top: "50%", transform: "translateY(-50%) rotate(45deg)" }}
-                        />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] left-0 top-1/2 -translate-y-1/2" />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] right-0 top-1/2 -translate-y-1/2" />
-                    </div>
-
-                    {/* Right: Content */}
-                    <div className="w-full md:w-[45%] flex flex-col items-start mt-8 md:mt-0">
-                        <div className="[font-family:'Cormorant_Unicase'] text-[28px] tracking-[-2px] leading-[25px] text-[#242514] mb-4">
-                            2002
+                {timeline.map((row, index) => (
+                    <div key={row.id} className={`relative flex flex-col ${index % 2 !== 0 ? "md:flex-row-reverse" : "md:flex-row"} items-center justify-between w-full mb-24 md:mb-32 story-row reveal-section`}>
+                        {/* Image */}
+                        <div className="w-full md:w-[45%] aspect-[4/3] md:aspect-auto md:h-[429px] overflow-hidden relative">
+                            <img
+                                src={images[index % images.length]}
+                                alt={row.title}
+                                className="w-full h-full object-cover reveal-image"
+                            />
                         </div>
-                        <h3 className="[font-family:'Cormorant_Unicase'] text-[46px] font-light tracking-[-2px] leading-[36px] lowercase text-[#242514] mb-6">
-                            ROOTED IN MODEST BEGINNINGS
-                        </h3>
-                        <p className="[font-family:'Raleway'] text-[16px] leading-[25px] text-[#242514]">
-                            Long before Savannah Water became a luxury brand, it began in the everyday rhythms of life in Madina, Ghana. Growing up in a modest household, Christopher experienced firsthand the value of water — not as a convenience, but as something earned through effort, patience, and family sacrifice. Some of his earliest memories were the long walks beside his mother to fetch water for their home.
-                        </p>
-                    </div>
-                </div>
 
-                {/* Row 2 (2007) */}
-                <div className="relative flex flex-col-reverse md:flex-row items-center justify-between w-full mb-24 md:mb-32 story-row reveal-section">
-                    {/* Left: Content */}
-                    <div className="w-full md:w-[45%] flex flex-col items-start md:items-end text-left md:text-right mt-8 md:mt-0">
-                        <div className="[font-family:'Cormorant_Unicase'] text-[28px] tracking-[-2px] leading-[25px] text-[#242514] mb-4">
-                            2007
+                        {/* Center: Spine Column */}
+                        <div className="hidden md:flex relative flex-col items-center justify-center w-[120px] self-stretch">
+                            <div className="absolute top-0 bottom-0 w-[1px] bg-[#cbcbcb]" />
+                            <div
+                                className="absolute w-[26.9px] h-[26.9px] bg-white border-[1.5px] border-[#cbcbcb] rotate-45 rounded-[25px]"
+                                style={{ top: "50%", transform: "translateY(-50%) rotate(45deg)" }}
+                            />
+                            <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] left-0 top-1/2 -translate-y-1/2" />
+                            <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] right-0 top-1/2 -translate-y-1/2" />
                         </div>
-                        <h3 className="[font-family:'Cormorant_Unicase'] text-[46px] font-light tracking-[-2px] leading-[36px] lowercase text-[#242514] mb-6">
-                            A TASTE PEOPLE REMEMBERED
-                        </h3>
-                        <p className="[font-family:'Raleway'] text-[16px] leading-[25px] text-[#242514]">
-                            Back home, Christopher watched his mother carefully prepare her smoked palm fruit infusion using traditional methods passed through experience and intuition. Over time, family members, neighbours, and visitors constantly asked for it. The flavour was comforting, distinctive, and unlike anything people typically associated with drinking water. What seemed ordinary at the time would later become unforgettable.
-                        </p>
-                    </div>
 
-                    {/* Center: Spine Column */}
-                    <div className="hidden md:flex relative flex-col items-center justify-center w-[120px] self-stretch">
-                        <div className="absolute top-0 bottom-0 w-[1px] bg-[#cbcbcb]" />
-                        <div
-                            className="absolute w-[26.9px] h-[26.9px] bg-white border-[1.5px] border-[#cbcbcb] rotate-45 rounded-[25px]"
-                            style={{ top: "50%", transform: "translateY(-50%) rotate(45deg)" }}
-                        />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] left-0 top-1/2 -translate-y-1/2" />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] right-0 top-1/2 -translate-y-1/2" />
-                    </div>
-
-                    {/* Right: Image */}
-                    <div className="w-full md:w-[45%] aspect-[4/3] md:aspect-auto md:h-[429px] overflow-hidden relative">
-                        <img
-                            src={storyMotherChild}
-                            alt="A Taste People Remembered"
-                            className="w-full h-full object-cover reveal-image"
-                        />
-                    </div>
-                </div>
-
-                {/* Row 3 (2018) */}
-                <div className="relative flex flex-col md:flex-row items-center justify-between w-full mb-24 md:mb-32 story-row reveal-section">
-                    {/* Left: Image */}
-                    <div className="w-full md:w-[45%] aspect-[4/3] md:aspect-auto md:h-[509px] overflow-hidden relative">
-                        <img
-                            src={storyChildDoorway}
-                            alt="A Memory Reawakened"
-                            className="w-full h-full object-cover reveal-image"
-                        />
-                    </div>
-
-                    {/* Center: Spine Column */}
-                    <div className="hidden md:flex relative flex-col items-center justify-center w-[120px] self-stretch">
-                        <div className="absolute top-0 bottom-0 w-[1px] bg-[#cbcbcb]" />
-                        <div
-                            className="absolute w-[26.9px] h-[26.9px] bg-white border-[1.5px] border-[#cbcbcb] rotate-45 rounded-[25px]"
-                            style={{ top: "50%", transform: "translateY(-50%) rotate(45deg)" }}
-                        />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] left-0 top-1/2 -translate-y-1/2" />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] right-0 top-1/2 -translate-y-1/2" />
-                    </div>
-
-                    {/* Right: Content */}
-                    <div className="w-full md:w-[45%] flex flex-col items-start mt-8 md:mt-0">
-                        <div className="[font-family:'Cormorant_Unicase'] text-[28px] tracking-[-2px] leading-[25px] text-[#242514] mb-4">
-                            2018
+                        {/* Content */}
+                        <div className={`w-full md:w-[45%] flex flex-col ${index % 2 !== 0 ? "items-start md:items-end text-left md:text-right" : "items-start"} mt-8 md:mt-0`}>
+                            <div className="[font-family:'Cormorant_Unicase'] text-[28px] tracking-[-2px] leading-[25px] text-[#242514] mb-4">
+                                {row.year_label}
+                            </div>
+                            <h3 className="[font-family:'Cormorant_Unicase'] text-[46px] font-light tracking-[-2px] leading-[36px] lowercase text-[#242514] mb-6">
+                                {row.title}
+                            </h3>
+                            <p className="[font-family:'Raleway'] text-[16px] leading-[25px] text-[#242514]">
+                                {row.story_content}
+                            </p>
                         </div>
-                        <h3 className="[font-family:'Cormorant_Unicase'] text-[46px] font-light tracking-[-2px] leading-[36px] lowercase text-[#242514] mb-6">
-                            A MEMORY REAWAKENED
-                        </h3>
-                        <p className="[font-family:'Raleway'] text-[16px] leading-[25px] text-[#242514]">
-                            After relocating to the United Kingdom, life changed completely. New environments, new opportunities, and a different pace of living reshaped Christopher's world. Yet one memory remained deeply rooted — the taste, aroma, and cultural warmth tied to his mother's process back in Ghana. What once felt local began to reveal global potential.
-                        </p>
                     </div>
-                </div>
-
-                {/* Row 4 (2024) */}
-                <div className="relative flex flex-col-reverse md:flex-row items-center justify-between w-full mb-8 story-row reveal-section">
-                    {/* Left: Content */}
-                    <div className="w-full md:w-[45%] flex flex-col items-start md:items-end text-left md:text-right mt-8 md:mt-0">
-                        <div className="[font-family:'Cormorant_Unicase'] text-[28px] tracking-[-2px] leading-[25px] text-[#242514] mb-4">
-                            2024
-                        </div>
-                        <h3 className="[font-family:'Cormorant_Unicase'] text-[46px] font-light tracking-[-2px] leading-[36px] lowercase text-[#242514] mb-6">
-                            REFINING TRADITION INTO LUXURY
-                        </h3>
-                        <p className="[font-family:'Raleway'] text-[16px] leading-[25px] text-[#242514]">
-                            Driven by the desire to preserve authenticity while elevating the experience, Christopher began working closely with his mother alongside food specialists and scientists. Together, they studied and refined the traditional infusion process to create something scalable, premium, and globally distinctive — without losing its cultural soul. Savannah Water emerged from that collaboration: a modern luxury hydration experience inspired by heritage, memory, and Ghanaian identity.
-                        </p>
-                    </div>
-
-                    {/* Center: Spine Column */}
-                    <div className="hidden md:flex relative flex-col items-center justify-center w-[120px] self-stretch">
-                        <div className="absolute top-0 bottom-0 w-[1px] bg-[#cbcbcb]" />
-                        <div
-                            className="absolute w-[26.9px] h-[26.9px] bg-white border-[1.5px] border-[#cbcbcb] rotate-45 rounded-[25px]"
-                            style={{ top: "50%", transform: "translateY(-50%) rotate(45deg)" }}
-                        />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] left-0 top-1/2 -translate-y-1/2" />
-                        <div className="absolute h-[1px] bg-[#cbcbcb] w-[40px] right-0 top-1/2 -translate-y-1/2" />
-                    </div>
-
-                    {/* Right: Image */}
-                    <div className="w-full md:w-[45%] aspect-[4/3] md:aspect-auto md:h-[524px] overflow-hidden relative">
-                        <img
-                            src={storyGoldenSpice}
-                            alt="Refining Tradition Into Luxury"
-                            className="w-full h-full object-cover reveal-image"
-                        />
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     );
 };
 
-export const CraftsmanshipSection = (): JSX.Element => {
-    const cards = [
-        {
-            image: storyManWorkshop,
-            alt: "Craftsmanship Workshop",
-            heading: "the art of smoking",
-            body: "Every batch of our smoked palm pulp infusion is prepared under strict quality standards, following precise timing and temperature curves that Christopher and his mother perfected. The artisanal smoking process imparts a delicate, sophisticated depth that defines Savannah Water.",
-        },
-        {
-            image: meshImage,
-            alt: "Heritage and Craft",
-            heading: "rooted in ritual",
-            body: "Long before it became a luxury product, the process behind Savannah Water was a sacred household ritual. Each infusion carries the memory of hands that worked with patience and purpose — a living connection between Ghanaian heritage and the modern world. This is not production. This is preservation.",
-        },
-        {
-            image: storyTeamTasting,
-            alt: "Quality Testing & Tasting",
-            heading: "scientific refinement",
-            body: "By pairing age-old traditions with modern food science, we ensure that every bottle preserves its natural active properties and delicate flavor notes. Our testing lab meticulously checks each batch for consistency, purity, and that unmistakable premium taste.",
-        },
-    ];
+export const CraftsmanshipSection = ({ cards }: { cards: any[] }): JSX.Element => {
+    const sublabel = "Craftsmanship & Process";
+    const headline = "signature collections";
+
+    // Map images to cards
+    const images = [storyManWorkshop, meshImage, storyTeamTasting];
 
     return (
         <div className="relative w-full bg-[#fafafa] py-20 lg:py-32 craftsmanship-section reveal-section">
@@ -255,10 +142,10 @@ export const CraftsmanshipSection = (): JSX.Element => {
                 {/* Section Header */}
                 <div className="text-center mb-16 lg:mb-24">
                     <span className="[font-family:'Raleway'] text-xs font-semibold tracking-[3px] text-[#242514]/40 uppercase block mb-3">
-                        Craftsmanship & Process
+                        {sublabel}
                     </span>
                     <h2 className="[font-family:'Cormorant_Unicase'] text-[40px] sm:text-[56px] lg:text-[72px] font-light tracking-[-2px] leading-none text-[#242514] lowercase craftsmanship-headline">
-                        signature collections
+                        {headline}
                     </h2>
                 </div>
 
@@ -280,12 +167,12 @@ export const CraftsmanshipSection = (): JSX.Element => {
                     style={{ paddingBottom: "48px" }}
                 >
                     {cards.map((card, i) => (
-                        <SwiperSlide key={i}>
+                        <SwiperSlide key={card.id}>
                             <div className="flex flex-col space-y-6 pb-2 craft-card">
                                 <div className="aspect-[4/5] overflow-hidden relative">
                                     <img
-                                        src={card.image}
-                                        alt={card.alt}
+                                        src={images[i % images.length]}
+                                        alt={card.heading}
                                         className="w-full h-full object-cover reveal-image"
                                     />
                                 </div>
@@ -293,7 +180,7 @@ export const CraftsmanshipSection = (): JSX.Element => {
                                     {card.heading}
                                 </h3>
                                 <p className="[font-family:'Raleway'] text-base lg:text-lg text-[#242514]/80 leading-relaxed">
-                                    {card.body}
+                                    {card.body_content}
                                 </p>
                             </div>
                         </SwiperSlide>
@@ -326,7 +213,27 @@ export const AboutPage = (): JSX.Element => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState("about");
 
+    const {
+        hero,
+        storyTimeline,
+        craftsmanshipCards,
+        signatureCollections,
+        loading: aboutLoading,
+        error: aboutError
+    } = useAboutPageCms();
+
+    const { homepageSections, loading: homeLoading, error: homeError } = useHomepageCms();
+
+    const loading = aboutLoading || homeLoading;
+    const error = aboutError || homeError;
+
+    // Helpers to get section data
+    const getHomeData = (key: string) => homepageSections.find(s => s.section_key === key);
+
     useEffect(() => {
+        // Only initialize animations if not loading and no error
+        if (loading || error) return;
+
         // Register ScrollTrigger plugin
         gsap.registerPlugin(ScrollTrigger);
 
@@ -760,36 +667,70 @@ export const AboutPage = (): JSX.Element => {
             gsap.ticker.remove(update);
             lenis.destroy();
         };
-    }, []);
+    }, [loading, error]);
+
+    if (loading) {
+        return (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center">
+                    <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#242514]"></div>
+                    <p className="mt-4 [font-family:'Raleway',Helvetica] text-sm font-medium tracking-[2px] uppercase text-[#242514]">
+                        Loading Savannah Story...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
+                <div className="max-w-md">
+                    <h2 className="[font-family:'Cormorant_Unicase',Helvetica] text-3xl text-[#242514]">
+                        Something went wrong
+                    </h2>
+                    <p className="mt-4 [font-family:'Raleway',Helvetica] text-[#242514]/70">
+                        {error}
+                    </p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-8 [font-family:'Raleway',Helvetica] text-sm font-semibold uppercase tracking-wider text-[#242514] underline"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <main className="relative w-full bg-white flex flex-col">
             <Header onMenuOpen={() => setIsMenuOpen(true)} />
 
             <section className="w-full">
-                <HeroSection />
+                <HeroSection data={hero} />
             </section>
 
             <section className="w-full">
-                <OurStorySection />
+                <OurStorySection timeline={storyTimeline} />
             </section>
 
             <section className="w-full">
-                <SignatureCollectionsSection />
+                <SignatureCollectionsSection collections={signatureCollections} />
             </section>
 
             <section className="w-full">
                 <div className="farm-banner w-full relative">
-                    <OurFarmsSection image={aboutFarms} />
+                    <OurFarmsSection image={aboutFarms} data={getHomeData("farms_banner")} />
                 </div>
             </section>
 
             <section className="w-full">
-                <CraftsmanshipSection />
+                <CraftsmanshipSection cards={craftsmanshipCards} />
             </section>
 
             <section className="w-full">
-                <FooterBrandInviteSection />
+                <FooterBrandInviteSection data={getHomeData("footer_invite")} />
             </section>
 
             <MenuOverlay

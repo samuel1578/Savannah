@@ -1,8 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useHomepageCms } from "../../hooks/useHomepageCms";
+import { useAboutPageCms } from "../../hooks/useAboutPageCms";
 import { HomepageSection, HomepageField, HomepageProduct } from "../../services/homepageCmsService";
+import { AboutHero, StoryTimelineEntry, CraftsmanshipCard, SignatureCollection } from "../../services/aboutPageCmsService";
 import { ProductEditor } from "./ProductEditor";
+import { StoryTimelineEditor } from "./StoryTimelineEditor";
+import { CraftsmanshipEditor } from "./CraftsmanshipEditor";
+import { SignatureCollectionsEditor } from "./SignatureCollectionsEditor";
+import { AboutHeroEditor } from "./AboutHeroEditor";
 import logoLight from "../../assets/logo-light.png";
 import styles from "./Dashboard.module.css";
 import gsap from "gsap";
@@ -99,6 +105,37 @@ const SIDEBAR_ORDER = [
     "footer_invite"
 ];
 
+// About Page Metadata
+const ABOUT_SECTION_METADATA: Record<string, { name: string; desc: string; chapter_marker?: string }> = {
+    about_hero: {
+        name: "Hero Section",
+        desc: "Hero section with headline and story introduction.",
+        chapter_marker: "01 — Heritage"
+    },
+    about_story_timeline: {
+        name: "Story Timeline",
+        desc: "Timeline of the Savannah journey from 2002 to present.",
+        chapter_marker: "02 — Timeline"
+    },
+    about_craftsmanship: {
+        name: "Craftsmanship",
+        desc: "Artisanal process and scientific refinement details.",
+        chapter_marker: "03 — Process"
+    },
+    about_signature_collections: {
+        name: "Signature Collections",
+        desc: "Savannah Reserve and Savannah Daily collection details.",
+        chapter_marker: "04 — Collections"
+    }
+};
+
+const ABOUT_SIDEBAR_ORDER = [
+    "about_hero",
+    "about_story_timeline",
+    "about_craftsmanship",
+    "about_signature_collections"
+];
+
 // Helper to format field keys to clean labels
 const formatFieldLabel = (key: string): string => {
     return key
@@ -106,20 +143,68 @@ const formatFieldLabel = (key: string): string => {
         .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+interface CmsSidebarItem {
+    id: string;
+    label: string;
+    key: string;
+    type: 'homepage' | 'about';
+    isVirtual: boolean;
+    chapter_marker?: string;
+    data?: any;
+}
+
 export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
+    const [activePage, setActivePage] = useState<"home" | "about">("home");
+
     const {
         homepageSections,
         products,
-        selectedSection,
-        loading,
-        sectionLoading,
-        error,
-        selectSection,
-        saving,
-        saveSection,
+        selectedSection: selectedHomeSection,
+        loading: homeLoading,
+        sectionLoading: homeSectionLoading,
+        error: homeError,
+        selectSection: selectHomeSection,
+        saving: homeSaving,
+        saveSection: saveHomeSection,
         saveProduct
     } = useHomepageCms();
+
+    const {
+        hero: aboutHero,
+        storyTimeline,
+        craftsmanshipCards,
+        signatureCollections,
+        loading: aboutLoading,
+        error: aboutError,
+        saving: aboutSaving,
+        saveHero,
+        saveStoryTimeline,
+        saveCraftsmanshipCard,
+        saveSignatureCollection
+    } = useAboutPageCms();
+
+    // Derived values based on active page
+    const isHome = activePage === "home";
+    const loading = isHome ? homeLoading : aboutLoading;
+    const error = isHome ? homeError : aboutError;
+    const selectedSection = isHome ? selectedHomeSection : null; // About sections are now handled via specialized components
+    const sectionLoading = isHome ? homeSectionLoading : false;
+    const saving = isHome ? homeSaving : aboutSaving;
+    const selectSection = isHome ? selectHomeSection : (id: number) => { }; // No-op for About page as we use keys
+    const saveSection = isHome ? saveHomeSection : async () => ({ success: true });
+
+    // Handle page switching: select the first section of the new page
+    useEffect(() => {
+        if (isHome) {
+            if (homepageSections.length > 0 && !selectedHomeSection) {
+                selectHomeSection(homepageSections[0].id);
+            }
+            setSelectedVirtualKey(null);
+        } else {
+            setSelectedVirtualKey("about_hero");
+        }
+    }, [activePage, homepageSections]);
 
     // Local state for sidebar toggle on mobile
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -256,6 +341,15 @@ export const Dashboard: React.FC = () => {
     const getPreviewHeadline = (): string => {
         if (selectedVirtualKey === "products_showcase") return "SAVANNAH COLLECTIONS";
         if (selectedVirtualKey === "heritage_stories") return "HERITAGE & LEGACY";
+
+        if (activePage === "about") {
+            if (selectedVirtualKey === "about_hero") return aboutHero?.hero_title.toUpperCase() || "ABOUT HERO";
+            if (selectedVirtualKey === "about_story_timeline") return "THE SAVANNAH JOURNEY";
+            if (selectedVirtualKey === "about_craftsmanship") return "CRAFTSMANSHIP & PROCESS";
+            if (selectedVirtualKey === "about_signature_collections") return "SIGNATURE COLLECTIONS";
+            return "ABOUT US";
+        }
+
         if (!selectedSection) return "SAVANNAH WATER";
 
         // Look for a headline, title, or main label in current form values
@@ -286,17 +380,49 @@ export const Dashboard: React.FC = () => {
     };
 
     // Prepare the ordered list of sidebar items
-    const sidebarItems = SIDEBAR_ORDER.map(key => {
-        const section = homepageSections.find(s => s.section_key === key);
-        if (section) {
-            return { type: "real", data: section, key: section.section_key };
-        }
-        const virtual = VIRTUAL_SECTIONS[key];
-        if (virtual) {
-            return { type: "virtual", data: virtual, key };
-        }
-        return null;
-    }).filter(Boolean);
+    const sidebarItems: CmsSidebarItem[] = isHome
+        ? SIDEBAR_ORDER.map(key => {
+            const section = homepageSections.find(s => s.section_key === key);
+            if (section) {
+                return {
+                    id: String(section.id),
+                    label: SECTION_METADATA[key]?.name || formatFieldLabel(key),
+                    key: section.section_key,
+                    type: 'homepage',
+                    isVirtual: false,
+                    chapter_marker: section.chapter_marker || undefined,
+                    data: section
+                };
+            }
+            const virtual = VIRTUAL_SECTIONS[key];
+            if (virtual) {
+                return {
+                    id: key,
+                    label: virtual.name,
+                    key: key,
+                    type: 'homepage',
+                    isVirtual: true,
+                    chapter_marker: virtual.chapter_marker,
+                    data: virtual
+                };
+            }
+            return null;
+        }).filter((item): item is CmsSidebarItem => item !== null)
+        : ABOUT_SIDEBAR_ORDER.map(key => {
+            const meta = ABOUT_SECTION_METADATA[key];
+            if (meta) {
+                return {
+                    id: key,
+                    label: meta.name,
+                    key: key,
+                    type: 'about',
+                    isVirtual: true,
+                    chapter_marker: meta.chapter_marker,
+                    data: meta
+                };
+            }
+            return null;
+        }).filter((item): item is CmsSidebarItem => item !== null);
 
     return (
         <div className={`min-h-screen bg-[#070D0A] text-[#F3F4F6] font-sans flex flex-col overflow-hidden ${styles.cmsContainer}`}>
@@ -342,14 +468,24 @@ export const Dashboard: React.FC = () => {
 
                         {/* Navigation Links */}
                         <nav className="flex flex-col gap-1.5">
-                            <button className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880] text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""}`}>
+                            <button
+                                onClick={() => setActivePage("home")}
+                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "home" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
+                            >
                                 <Home className="w-4 h-4" />
                                 {!isNavCollapsed && <span>Home</span>}
                             </button>
 
+                            <button
+                                onClick={() => setActivePage("about")}
+                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "about" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
+                            >
+                                <Info className="w-4 h-4" />
+                                {!isNavCollapsed && <span>About Us</span>}
+                            </button>
+
                             {/* Disabled placeholders */}
                             {[
-                                { label: "About Us", icon: Info },
                                 { label: "Our Blog", icon: BookOpen },
                                 { label: "Contact Us", icon: Mail },
                                 { label: "Media Library", icon: ImageIcon },
@@ -412,37 +548,28 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        {sidebarItems.map((item: any) => {
-                            const isVirtual = item.type === "virtual";
-                            const isSelected = isVirtual
+                        {sidebarItems.map((item) => {
+                            const isSelected = item.isVirtual
                                 ? selectedVirtualKey === item.key
-                                : (selectedSection?.id === item.data.id && !selectedVirtualKey);
-
-                            const meta = isVirtual
-                                ? item.data
-                                : (SECTION_METADATA[item.key] || {
-                                    name: formatFieldLabel(item.key),
-                                    desc: "",
-                                    chapter_marker: item.data.chapter_marker
-                                });
+                                : (selectedSection?.id === Number(item.id) && !selectedVirtualKey);
 
                             return (
                                 <button
-                                    key={isVirtual ? item.key : item.data.id}
-                                    onClick={() => isVirtual ? handleVirtualSelect(item.key) : selectSection(item.data.id)}
+                                    key={item.id}
+                                    onClick={() => item.isVirtual ? handleVirtualSelect(item.key) : selectSection(Number(item.id))}
                                     className={`flex flex-col text-left ${styles.outlineItem} ${isSelected ? styles.outlineItemActive : ""}`}
                                 >
                                     <div className="flex items-center justify-between gap-2">
                                         <span className={`text-sm font-serif tracking-wide transition-colors ${isSelected ? "text-[#C5A880]" : "text-[#F3F4F6]/60"}`}>
-                                            {meta.name}
+                                            {item.label}
                                         </span>
-                                        {isVirtual && (
+                                        {item.isVirtual && (
                                             <Sparkles className={`w-3 h-3 ${isSelected ? "text-[#C5A880]" : "text-[#C5A880]/10"}`} />
                                         )}
                                     </div>
-                                    {meta.chapter_marker && !isSelected && (
+                                    {item.chapter_marker && !isSelected && (
                                         <span className="text-[7px] font-medium tracking-[0.1em] text-[#9CA3AF]/30 uppercase mt-0.5">
-                                            {meta.chapter_marker}
+                                            {item.chapter_marker}
                                         </span>
                                     )}
                                 </button>
@@ -473,7 +600,11 @@ export const Dashboard: React.FC = () => {
                                     Editor
                                 </h1>
                                 <p className="text-[#9CA3AF] text-sm font-light leading-relaxed mt-1">
-                                    {selectedVirtualKey ? VIRTUAL_SECTIONS[selectedVirtualKey].name : (selectedSection ? SECTION_METADATA[selectedSection.section_key]?.name : "Select a section to begin")}
+                                    {selectedVirtualKey
+                                        ? (VIRTUAL_SECTIONS[selectedVirtualKey]?.name || ABOUT_SECTION_METADATA[selectedVirtualKey]?.name || "Specialized Editor")
+                                        : (selectedSection
+                                            ? (SECTION_METADATA[selectedSection.section_key]?.name || formatFieldLabel(selectedSection.section_key))
+                                            : "Select a section to begin")}
                                 </p>
                             </div>
                         </div>
@@ -490,7 +621,7 @@ export const Dashboard: React.FC = () => {
                         <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
                             <Loader2 className="w-10 h-10 text-[#C5A880] animate-spin mb-4" />
                             <p className="text-xs font-light tracking-[0.2em] text-[#C5A880] uppercase animate-pulse">
-                                Retrieving Homepage Structures...
+                                Retrieving {isHome ? "Homepage" : "About Us"} Structures...
                             </p>
                         </div>
                     ) : error ? (
@@ -523,6 +654,30 @@ export const Dashboard: React.FC = () => {
                                 <ProductEditor
                                     products={products}
                                     onSave={handleProductSave}
+                                    saving={saving}
+                                />
+                            ) : selectedVirtualKey === "about_story_timeline" ? (
+                                <StoryTimelineEditor
+                                    timeline={storyTimeline}
+                                    onSave={saveStoryTimeline}
+                                    saving={saving}
+                                />
+                            ) : selectedVirtualKey === "about_hero" ? (
+                                <AboutHeroEditor
+                                    hero={aboutHero}
+                                    onSave={saveHero}
+                                    saving={saving}
+                                />
+                            ) : selectedVirtualKey === "about_craftsmanship" ? (
+                                <CraftsmanshipEditor
+                                    cards={craftsmanshipCards}
+                                    onSave={saveCraftsmanshipCard}
+                                    saving={saving}
+                                />
+                            ) : selectedVirtualKey === "about_signature_collections" ? (
+                                <SignatureCollectionsEditor
+                                    collections={signatureCollections}
+                                    onSave={saveSignatureCollection}
                                     saving={saving}
                                 />
                             ) : selectedVirtualKey === "heritage_stories" ? (

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import colImage from "../../assets/col.jpg";
 
-export const SignatureCollectionsSection = (): JSX.Element => {
-    const [openTab, setOpenTab] = useState<"reserve" | "daily" | null>("reserve");
+export const SignatureCollectionsSection = ({ collections }: { collections: any[] }): JSX.Element => {
+    const headline = "signature savannah collections";
 
-    const handleTabClick = (tab: "reserve" | "daily") => {
-        setOpenTab((prev) => (prev === tab ? null : tab));
+    const [openTab, setOpenTab] = useState<number | null>(collections.length > 0 ? collections[0].id : null);
+
+    const handleTabClick = (id: number) => {
+        setOpenTab((prev) => (prev === id ? null : id));
     };
 
     return (
@@ -94,65 +96,37 @@ export const SignatureCollectionsSection = (): JSX.Element => {
             {/* Outer wrapper */}
             <div className="sig-outer-wrapper">
                 {/* Left Column — Heading */}
-                <h2 className="sig-left-heading collections-left">
-                    signature<br />
-                    savannah<br />
-                    collections
+                <h2 className="sig-left-heading collections-left" dangerouslySetInnerHTML={{ __html: headline.replace(/\s/g, '<br />') }}>
                 </h2>
 
                 {/* Right Column — Accordion tabs */}
                 <div className="sig-accordion-wrapper collections-right">
-                    {/* Savannah Reserve Tab */}
-                    <div>
-                        <div
-                            className="sig-tab-header"
-                            onClick={() => handleTabClick("reserve")}
-                        >
-                            <span>savannah reserve</span>
-                            <span
-                                className={`sig-chevron ${openTab === "reserve" ? "open" : "closed"
-                                    }`}
+                    {collections.map((item) => (
+                        <div key={item.id}>
+                            <div
+                                className="sig-tab-header"
+                                onClick={() => handleTabClick(item.id)}
                             >
-                                ▾
-                            </span>
-                        </div>
-                        <div
-                            className="sig-tab-panel"
-                            style={{
-                                maxHeight: openTab === "reserve" ? "200px" : "0px",
-                            }}
-                        >
-                            <div className="sig-tab-content">
-                                2024 • Signature Smoked Palm Fruit Infused Water • Premium Bottle Collection  A refined luxury hydration experience crafted from purified water and a delicate smoked palm fruit infusion inspired by Ghanaian heritage and modern sophistication.
+                                <span>{item.tab_title}</span>
+                                <span
+                                    className={`sig-chevron ${openTab === item.id ? "open" : "closed"
+                                        }`}
+                                >
+                                    ▾
+                                </span>
+                            </div>
+                            <div
+                                className="sig-tab-panel"
+                                style={{
+                                    maxHeight: openTab === item.id ? "200px" : "0px",
+                                }}
+                            >
+                                <div className="sig-tab-content">
+                                    {item.tab_content}
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Savannah Daily Tab */}
-                    <div>
-                        <div
-                            className="sig-tab-header"
-                            onClick={() => handleTabClick("daily")}
-                        >
-                            <span>savannah daily</span>
-                            <span
-                                className={`sig-chevron ${openTab === "daily" ? "open" : "closed"
-                                    }`}
-                            >
-                                ▾
-                            </span>
-                        </div>
-                        <div
-                            className="sig-tab-panel"
-                            style={{
-                                maxHeight: openTab === "daily" ? "200px" : "0px",
-                            }}
-                        >
-                            <div className="sig-tab-content">
-                                2024 • Everyday Smoked Palm Fruit Infused Water • Classic Bottle Collection  The everyday expression of Savannah Water — the same authentic Ghanaian heritage, crafted for daily rituals and modern living.
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
 
