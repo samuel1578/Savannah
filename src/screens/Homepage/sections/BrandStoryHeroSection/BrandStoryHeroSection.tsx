@@ -102,9 +102,9 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
           <div className="ambient-light-overlay" />
 
           {/* Desktop/Laptop Layout (xl and up) */}
-          <div className="hidden xl:block absolute inset-0 w-[1920px] h-[1200px] left-1/2 -translate-x-1/2">
+          <div className="hidden xl:block absolute inset-0 max-w-[1920px] h-[1200px] left-1/2 -translate-x-1/2 w-full">
             {/* Left side background - Full Bleed */}
-            <div className="absolute left-0 top-0 h-full w-[730px] overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-[38%] min-w-[500px] max-w-[730px] overflow-hidden">
               <img
                 className="w-full h-full object-cover hero-bottle"
                 alt={cmsHeroImageAlt}
@@ -113,7 +113,7 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
             </div>
 
             {/* Heading: every bottle tells a story */}
-            <h1 className="absolute left-[866px] top-[270px] w-[381px] h-[569px] font-qi124-qodeinteractive-com-semantic-heading-1-lower text-[140px] font-light leading-[100px] tracking-[-4px] text-[#242514] hero-headline">
+            <h1 className="absolute left-[45%] top-[270px] max-w-[28%] font-qi124-qodeinteractive-com-semantic-heading-1-lower text-[clamp(80px,7.3vw,140px)] font-light leading-[0.85] tracking-[-4px] text-[#242514] hero-headline">
               {storyTitleLines.map((line, idx) => (
                 <span key={`desktop-line-${idx}`} className="block hero-headline-line">{line}</span>
               ))}
@@ -121,23 +121,23 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
 
             {/* s.jpg image - Increased Height & Top Alignment */}
             <div
-              className="absolute left-[1396px] top-[291px] w-[445px] h-[480px] bg-cover bg-top hero-story-card"
+              className="absolute right-[40px] top-[291px] w-[23%] max-w-[445px] h-[480px] bg-cover bg-top hero-story-card"
               style={{ backgroundImage: `url(${displayInspirationImage})` }}
               aria-label={cmsInspirationImageAlt}
             />
 
             {/* Text wrapper */}
-            <p className="absolute left-[1436px] top-[804px] w-[299px] [font-family:'Raleway',Helvetica] text-base font-normal leading-[25px] text-[#242514] hero-story-card">
+            <p className="absolute right-[186px] top-[804px] w-[299px] [font-family:'Raleway',Helvetica] text-base font-normal leading-[25px] text-[#242514] hero-story-card">
               {inspirationBody}
             </p>
 
             {/* heading-luigi */}
-            <div className="absolute left-[1388px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[70px] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card">
+            <div className="absolute right-[108px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[clamp(40px,3.6vw,70px)] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card">
               {inspirationTitle}
             </div>
 
             {/* Inspiration */}
-            <div className="absolute left-[1395px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card">
+            <div className="absolute right-[335px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card">
               {inspirationTag}
             </div>
           </div>
