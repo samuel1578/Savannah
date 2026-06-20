@@ -15,6 +15,19 @@ export const ReviewsSection = ({ data }: ReviewsSectionProps): JSX.Element => {
     const label = getField("reviews_label", "REVIEWS");
     const url = getField("reviews_url", "#reviews");
 
+    // Resolve Reviews Image from CMS
+    const cmsReviewsImageUrl = getField("reviews_image_url", "");
+    const cmsReviewsImageAlt = getField("reviews_image_alt", "Reviews");
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+        return `https://savannahdrinks.co.uk/${path}`;
+    };
+
+    const displayReviewsImage = cmsReviewsImageUrl ? getFullImageUrl(cmsReviewsImageUrl) : reviewsImage;
+
     return (
         <a
             href={url}
@@ -22,8 +35,8 @@ export const ReviewsSection = ({ data }: ReviewsSectionProps): JSX.Element => {
         >
             {/* Full-bleed background image with scale effect on hover */}
             <img
-                src={reviewsImage}
-                alt="Reviews"
+                src={displayReviewsImage}
+                alt={cmsReviewsImageAlt}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-103 reveal-image community-image"
             />
 

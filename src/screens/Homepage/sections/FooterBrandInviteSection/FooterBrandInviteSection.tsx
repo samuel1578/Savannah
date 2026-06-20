@@ -23,6 +23,19 @@ export const FooterBrandInviteSection = ({ data }: FooterBrandInviteSectionProps
   const newsletterPlaceholder = getField("newsletter_placeholder", "Your E-mail");
   const newsletterButtonText = getField("newsletter_button_text", "Send");
 
+  // Resolve Footer Logo from CMS
+  const cmsFooterLogoUrl = getField("footer_logo_image_url", "");
+  const cmsFooterLogoAlt = getField("footer_logo_image_alt", "Savannah Water Logo");
+
+  const getFullImageUrl = (path: string) => {
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+    return `https://savannahdrinks.co.uk/${path}`;
+  };
+
+  const displayFooterLogo = cmsFooterLogoUrl ? getFullImageUrl(cmsFooterLogoUrl) : logoLight;
+
   return (
     <footer className="relative w-full bg-qi124qodeinteractivecomouter-space text-white py-20 px-6 sm:px-10 lg:px-14 reveal-section">
       <div className="mx-auto flex flex-col items-center justify-center max-w-[793px] text-center">
@@ -30,8 +43,8 @@ export const FooterBrandInviteSection = ({ data }: FooterBrandInviteSectionProps
         {/* Logo Image */}
         <div className="flex flex-col items-center mb-12 footer-logotype">
           <img
-            src={logoLight}
-            alt="Savannah Water Logo"
+            src={displayFooterLogo}
+            alt={cmsFooterLogoAlt}
             className="w-[280px] sm:w-[350px] lg:w-[420px] h-auto object-contain"
           />
         </div>

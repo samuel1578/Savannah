@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../middleware/cors.php';
-
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../config/database.php';
@@ -14,6 +13,7 @@ validate_csrf();
 try {
     // Parse JSON body
     $input = json_decode(file_get_contents('php://input'), true);
+    file_put_contents(__DIR__ . '/save-debug.log', json_encode($input, JSON_PRETTY_PRINT));
 
     $sectionId = $input['section_id'] ?? null;
     $fields = $input['fields'] ?? null;
@@ -60,7 +60,7 @@ try {
         WHERE section_id = ? AND field_key = ?
     ");
 
-    $totalAffected = 0;
+    $updatedCount = 0;
 
     foreach ($fields as $field) {
         $key = $field['key'] ?? null;
@@ -70,25 +70,8 @@ try {
             continue; // Skip invalid field structures
         }
 
-        $updateStmt->execute([
-            $value,
-            $sectionId,
-            $key
-        ]);
-
-        $affected = $updateStmt->rowCount();
-        $totalAffected += $affected;
-
-        file_put_contents(
-            __DIR__ . '/update-debug.log',
-            json_encode([
-                'section_id' => $sectionId,
-                'key' => $key,
-                'value' => $value,
-                'affected_rows' => $affected
-            ]) . PHP_EOL,
-            FILE_APPEND
-        );
+        $updateStmt->execute([$value, $sectionId, $key]);
+        $updatedCount++;
     }
 
     // Commit transaction
@@ -96,10 +79,8 @@ try {
 
     echo json_encode([
         'success' => true,
-        'section_id' => $sectionId,
-        'processed_fields' => count($fields),
-        'affected_rows' => $totalAffected,
-        'database' => DB_NAME
+        'section_id' => (int) $sectionId,
+        'updated_fields' => $updatedCount
     ]);
 
 } catch (Exception $e) {

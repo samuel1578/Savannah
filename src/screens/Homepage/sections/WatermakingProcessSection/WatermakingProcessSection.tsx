@@ -16,6 +16,19 @@ export const WatermakingProcessSection = ({ data }: WatermakingProcessSectionPro
     const label = getField("watermaking_label", "WATERMAKING PROCESS");
     const url = getField("watermaking_url", "#watermaking-process");
 
+    // Resolve Process Image from CMS
+    const cmsProcessImageUrl = getField("watermaking_image_url", "");
+    const cmsProcessImageAlt = getField("watermaking_image_alt", "Watermaking Process");
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+        return `https://savannahdrinks.co.uk/${path}`;
+    };
+
+    const displayProcessImage = cmsProcessImageUrl ? getFullImageUrl(cmsProcessImageUrl) : watermakingImage;
+
     return (
         <a
             href={url}
@@ -27,8 +40,8 @@ export const WatermakingProcessSection = ({ data }: WatermakingProcessSectionPro
             </div>
             {/* Full-bleed background image with scale effect on hover */}
             <img
-                src={watermakingImage}
-                alt="Watermaking Process"
+                src={displayProcessImage}
+                alt={cmsProcessImageAlt}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-103 reveal-image lifestyle-image"
             />
 

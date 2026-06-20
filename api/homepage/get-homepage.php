@@ -61,6 +61,61 @@ try {
         }
     }
 
+   /*
+|--------------------------------------------------------------------------
+| Resolve Homepage Section Media Assets
+|--------------------------------------------------------------------------
+*/
+
+$imageFields = [
+    'hero_image_id',
+    'hero_story_card_image_id',
+    'map_image_id',
+    'palm_banner_image_id',
+    'watermaking_image_id',
+    'farms_image_id',
+    'reviews_image_id',
+    'footer_logo_image_id'
+];
+
+foreach ($sections as &$section) {
+
+    foreach ($section['fields'] as $field) {
+
+        if (
+            in_array($field['key'], $imageFields) &&
+            !empty($field['value'])
+        ) {
+
+            $mediaStmt = $db->prepare(
+                "SELECT file_path, alt_text FROM media_assets WHERE id = ?"
+            );
+
+            $mediaStmt->execute([$field['value']]);
+
+            $media = $mediaStmt->fetch();
+
+            if ($media) {
+
+                $baseKey = str_replace('_id', '', $field['key']);
+
+                $section['fields'][] = [
+                    'key' => $baseKey . '_url',
+                    'type' => 'url',
+                    'value' => $media['file_path']
+                ];
+
+                $section['fields'][] = [
+                    'key' => $baseKey . '_alt',
+                    'type' => 'text',
+                    'value' => $media['alt_text']
+                ];
+            }
+        }
+    }
+}
+
+unset($section);
     /*
     |--------------------------------------------------------------------------
     | Homepage Products

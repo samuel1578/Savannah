@@ -27,6 +27,23 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
   const inspirationTag = getField("hero_inspiration_tag", "Inspiration");
   const inspirationBody = getField("hero_inspiration_body", "Savannah Water was inspired by the strength, warmth, and resilience of Mama Annita — a woman whose spirit reflected the richness of tradition and the beauty of authenticity. Her legacy lives on through every bottle, reminding us that true refinement begins at the source.");
 
+  // Resolve Hero Image from CMS
+  const cmsHeroImageUrl = getField("hero_image_url", "");
+  const cmsHeroImageAlt = getField("hero_image_alt", "Savannah Water bottle");
+
+  const cmsInspirationImageUrl = getField("hero_story_card_image_url", "");
+  const cmsInspirationImageAlt = getField("hero_story_card_image_alt", "Mama Annita");
+
+  const getFullImageUrl = (path: string) => {
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+    return `https://savannahdrinks.co.uk/${path}`;
+  };
+
+  const displayHeroImage = cmsHeroImageUrl ? getFullImageUrl(cmsHeroImageUrl) : heroImage;
+  const displayInspirationImage = cmsInspirationImageUrl ? getFullImageUrl(cmsInspirationImageUrl) : sImage;
+
   // Map products to local structure while keeping images hardcoded
   const displayProducts = products.map(p => {
     const isReserve = p.product_key.includes("reserve");
@@ -90,8 +107,8 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
             <div className="absolute left-0 top-0 h-full w-[730px] overflow-hidden">
               <img
                 className="w-full h-full object-cover hero-bottle"
-                alt="Savannah Water bottle"
-                src={heroImage}
+                alt={cmsHeroImageAlt}
+                src={displayHeroImage}
               />
             </div>
 
@@ -105,7 +122,8 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
             {/* s.jpg image - Increased Height & Top Alignment */}
             <div
               className="absolute left-[1396px] top-[291px] w-[445px] h-[480px] bg-cover bg-top hero-story-card"
-              style={{ backgroundImage: `url(${sImage})` }}
+              style={{ backgroundImage: `url(${displayInspirationImage})` }}
+              aria-label={cmsInspirationImageAlt}
             />
 
             {/* Text wrapper */}
@@ -130,8 +148,8 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
             <div className="relative w-full lg:w-[40%] h-[400px] lg:h-full overflow-hidden">
               <img
                 className="w-full h-full object-cover hero-bottle"
-                alt="Savannah Water bottle"
-                src={heroImage}
+                alt={cmsHeroImageAlt}
+                src={displayHeroImage}
               />
             </div>
 
@@ -150,7 +168,8 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
               <div className="flex-1 flex flex-col items-start max-w-[450px] hero-story-card">
                 <div
                   className="mb-6 h-[260px] w-[200px] bg-cover bg-top"
-                  style={{ backgroundImage: `url(${sImage})` }}
+                  style={{ backgroundImage: `url(${displayInspirationImage})` }}
+                  aria-label={cmsInspirationImageAlt}
                 />
                 <div className="space-y-4">
                   <p className="[font-family:'Raleway',Helvetica] text-sm leading-[25px] text-[#242514] sm:text-base">

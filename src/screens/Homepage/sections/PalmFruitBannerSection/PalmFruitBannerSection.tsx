@@ -7,14 +7,32 @@ interface PalmFruitBannerSectionProps {
 }
 
 export const PalmFruitBannerSection = ({ data }: PalmFruitBannerSectionProps): JSX.Element => {
-    const label = data?.fields.find(f => f.key === "palm_banner_label")?.value || "our selection";
+    // Helper to get field value
+    const getField = (key: string, fallback: string) => {
+        return data?.fields.find(f => f.key === key)?.value || fallback;
+    };
+
+    const label = getField("palm_banner_label", "our selection");
+
+    // Resolve Banner Image from CMS
+    const cmsBannerImageUrl = getField("palm_banner_image_url", "");
+    const cmsBannerImageAlt = getField("palm_banner_image_alt", "Palm Fruit Selection");
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+        return `https://savannahdrinks.co.uk/${path}`;
+    };
+
+    const displayBannerImage = cmsBannerImageUrl ? getFullImageUrl(cmsBannerImageUrl) : selectionImage;
 
     return (
         <section className="relative w-full h-[280px] sm:h-[350px] lg:h-[450px] bg-[#2f1810] overflow-hidden flex items-end reveal-section palm-fruit-banner">
             {/* Full-bleed background image */}
             <img
-                src={selectionImage}
-                alt="Palm Fruit Selection"
+                src={displayBannerImage}
+                alt={cmsBannerImageAlt}
                 className="absolute inset-0 w-full h-full object-cover reveal-image"
             />
 

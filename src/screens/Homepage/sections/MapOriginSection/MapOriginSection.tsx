@@ -22,6 +22,19 @@ export const MapOriginSection = ({ data }: MapOriginSectionProps): JSX.Element =
     const headlineLine3 = getField("map_headline_line_3", "LUXURY");
     const headlineLine4 = getField("map_headline_line_4", "HYDRATION");
 
+    // Resolve Map Image from CMS
+    const cmsMapImageUrl = getField("map_image_url", "");
+    const cmsMapImageAlt = getField("map_image_alt", "Ghana Map of Savannah Regions");
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+        return `https://savannahdrinks.co.uk/${path}`;
+    };
+
+    const displayMapImage = cmsMapImageUrl ? getFullImageUrl(cmsMapImageUrl) : mapImage;
+
     return (
         <section className="relative w-full bg-qi124qodeinteractivecomouter-space text-white py-16 px-6 sm:px-10 lg:px-14 map-section">
             {/* Understated discovered Chapter Marker */}
@@ -34,8 +47,8 @@ export const MapOriginSection = ({ data }: MapOriginSectionProps): JSX.Element =
                     {/* Map Column */}
                     <div className="relative flex items-center justify-center min-h-[350px] w-full max-w-[450px] mx-auto overflow-hidden map-container">
                         <img
-                            src={mapImage}
-                            alt="Ghana Map of Savannah Regions"
+                            src={displayMapImage}
+                            alt={cmsMapImageAlt}
                             className="w-full h-auto object-contain max-h-[350px] map-image"
                         />
                         {/* Gold Markers */}
