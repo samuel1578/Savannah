@@ -276,10 +276,10 @@ export const AboutPage = (): JSX.Element => {
 
             // Track active sections for the menu
             const sections = [
-                { id: "home", selector: ".relative" },
-                { id: "about", selector: ".heritage-section" },
-                { id: "blog", selector: ".community-banner" },
-                { id: "contact", selector: ".cta-section" },
+                { id: "about", selector: ".hero-section" },
+                { id: "about", selector: ".our-story-section" },
+                { id: "about", selector: ".collections-section" },
+                { id: "about", selector: ".craftsmanship-section" },
             ];
 
             sections.forEach((sec) => {

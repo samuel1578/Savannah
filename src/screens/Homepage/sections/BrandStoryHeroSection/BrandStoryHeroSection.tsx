@@ -103,6 +103,26 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
 
           {/* Desktop/Laptop Layout (xl and up) */}
           <div className="hidden xl:block absolute inset-0 max-w-[1920px] h-[1200px] left-1/2 -translate-x-1/2 w-full">
+            <style>{`
+              @media (min-width: 1280px) and (max-width: 1800px) {
+                .xl\\:block .hero-headline {
+                  left: 40% !important;
+                  max-width: 28% !important;
+                }
+                .xl\\:block .hero-portrait {
+                  right: 2% !important;
+                }
+                .xl\\:block .hero-story-text {
+                  right: 8% !important;
+                }
+                .xl\\:block .hero-inspiration-title {
+                  right: 4% !important;
+                }
+                .xl\\:block .hero-inspiration-tag {
+                  right: 16% !important;
+                }
+              }
+            `}</style>
             {/* Left side background - Full Bleed */}
             <div className="absolute left-0 top-0 h-full w-[38%] min-w-[500px] max-w-[730px] overflow-hidden">
               <img
@@ -121,23 +141,23 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
 
             {/* s.jpg image - Increased Height & Top Alignment */}
             <div
-              className="absolute right-[40px] top-[291px] w-[23%] max-w-[445px] h-[480px] bg-cover bg-top hero-story-card"
+              className="absolute right-[40px] top-[291px] w-[23%] max-w-[445px] h-[480px] bg-cover bg-top hero-story-card hero-portrait"
               style={{ backgroundImage: `url(${displayInspirationImage})` }}
               aria-label={cmsInspirationImageAlt}
             />
 
             {/* Text wrapper */}
-            <p className="absolute right-[186px] top-[804px] w-[299px] [font-family:'Raleway',Helvetica] text-base font-normal leading-[25px] text-[#242514] hero-story-card">
+            <p className="absolute right-[186px] top-[804px] w-[299px] [font-family:'Raleway',Helvetica] text-base font-normal leading-[25px] text-[#242514] hero-story-card hero-story-text">
               {inspirationBody}
             </p>
 
             {/* heading-luigi */}
-            <div className="absolute right-[108px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[clamp(40px,3.6vw,70px)] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card">
+            <div className="absolute right-[108px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[clamp(40px,3.6vw,70px)] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card hero-inspiration-title">
               {inspirationTitle}
             </div>
 
             {/* Inspiration */}
-            <div className="absolute right-[335px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card">
+            <div className="absolute right-[335px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card hero-inspiration-tag">
               {inspirationTag}
             </div>
           </div>
