@@ -10,6 +10,10 @@ export interface AboutHero {
     section_key: string;
     hero_title: string;
     hero_subtitle: string;
+    hero_image_id: number | null;
+    farms_image_id: number | null;
+    hero_image_url?: string;
+    farms_image_url?: string;
     status: string;
 }
 
@@ -18,6 +22,8 @@ export interface StoryTimelineEntry {
     year_label: string;
     title: string;
     story_content: string;
+    image_id: number | null;
+    image_url?: string;
     display_order: number;
     status: string;
 }
@@ -26,6 +32,8 @@ export interface CraftsmanshipCard {
     id: number;
     heading: string;
     body_content: string;
+    image_id: number | null;
+    image_url?: string;
     image_path: string | null;
     display_order: number;
     status: string;
@@ -35,6 +43,8 @@ export interface SignatureCollection {
     id: number;
     tab_title: string;
     tab_content: string;
+    main_image_id: number | null;
+    main_image_url?: string;
     image_path: string | null;
     display_order: number;
     status: string;

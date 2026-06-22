@@ -100,6 +100,36 @@ export const useAboutPageCms = () => {
         }
     };
 
+    // Local state updates for image selection (Frontend only)
+    const updateLocalHeroImage = (fieldKey: string, imageId: number, imageUrl: string) => {
+        setHero(prev => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                [fieldKey]: imageId,
+                [`${fieldKey.replace("_id", "")}_url`]: imageUrl
+            };
+        });
+    };
+
+    const updateLocalTimelineImage = (itemId: number, imageId: number, imageUrl: string) => {
+        setStoryTimeline(prev => prev.map(item =>
+            item.id === itemId ? { ...item, image_id: imageId, image_url: imageUrl } : item
+        ));
+    };
+
+    const updateLocalCraftsmanshipImage = (itemId: number, imageId: number, imageUrl: string) => {
+        setCraftsmanshipCards(prev => prev.map(item =>
+            item.id === itemId ? { ...item, image_id: imageId, image_url: imageUrl } : item
+        ));
+    };
+
+    const updateLocalSignatureImage = (imageId: number, imageUrl: string) => {
+        setSignatureCollections(prev => prev.map(item =>
+            ({ ...item, main_image_id: imageId, main_image_url: imageUrl })
+        ));
+    };
+
     return {
         hero,
         storyTimeline,
@@ -113,5 +143,9 @@ export const useAboutPageCms = () => {
         saveStoryTimeline,
         saveCraftsmanshipCard,
         saveSignatureCollection,
+        updateLocalHeroImage,
+        updateLocalTimelineImage,
+        updateLocalCraftsmanshipImage,
+        updateLocalSignatureImage
     };
 };

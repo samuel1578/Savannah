@@ -1,24 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StoryTimelineEntry } from "../../services/aboutPageCmsService";
-import { Save, Loader2, CheckCircle2, AlertCircle, History } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle, History, ImageIcon } from "lucide-react";
 import styles from "./Dashboard.module.css";
 
 interface StoryTimelineEditorProps {
     timeline: StoryTimelineEntry[];
     onSave: (entry: Partial<StoryTimelineEntry> & { id: number }) => Promise<any>;
     saving: boolean;
+    onMediaPickerOpen: (itemId: number, fieldKey: string, label: string) => void;
 }
 
 export const StoryTimelineEditor: React.FC<StoryTimelineEditorProps> = ({
     timeline,
     onSave,
-    saving
+    saving,
+    onMediaPickerOpen
 }) => {
     // Track which entry is being edited locally
     const [localTimeline, setLocalTimeline] = useState<StoryTimelineEntry[]>(timeline);
     const [saveStatus, setSaveStatus] = useState<Record<number, "idle" | "saving" | "success" | "error">>({});
 
-    const handleInputChange = (id: number, field: keyof StoryTimelineEntry, value: string) => {
+    useEffect(() => {
+        setLocalTimeline(prev => {
+            // If prev is empty (initial load), just use timeline
+            if (prev.length === 0) return timeline;
+
+            return timeline.map(incoming => {
+                const existing = prev.find(p => p.id === incoming.id);
+                if (existing) {
+                    // We want to update image_id and image_url from incoming (from the hook)
+                    // but keep text fields from existing (local state)
+                    return {
+                        ...existing,
+                        image_id: incoming.image_id,
+                        image_url: incoming.image_url,
+                        // Update other fields only if they changed in a way that suggests a fresh fetch from server
+                        // For now, let's keep it simple: keep local text, update images.
+                    };
+                }
+                return incoming;
+            });
+        });
+    }, [timeline]);
+
+    const handleInputChange = (id: number, field: string, value: any) => {
         setLocalTimeline(prev => prev.map(entry =>
             entry.id === id ? { ...entry, [field]: value } : entry
         ));
@@ -35,6 +60,7 @@ export const StoryTimelineEditor: React.FC<StoryTimelineEditorProps> = ({
                 year_label: entry.year_label,
                 title: entry.title,
                 story_content: entry.story_content,
+                image_id: entry.image_id,
                 status: entry.status
             });
             setSaveStatus(prev => ({ ...prev, [id]: "success" }));
@@ -44,6 +70,12 @@ export const StoryTimelineEditor: React.FC<StoryTimelineEditorProps> = ({
         } catch (err) {
             setSaveStatus(prev => ({ ...prev, [id]: "error" }));
         }
+    };
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        return `https://savannahdrinks.co.uk${path.startsWith("/") ? "" : "/"}${path}`;
     };
 
     return (
@@ -84,10 +116,10 @@ export const StoryTimelineEditor: React.FC<StoryTimelineEditorProps> = ({
                                     onClick={() => handleSaveEntry(entry.id)}
                                     disabled={saving || isEntrySaving}
                                     className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs tracking-widest uppercase font-medium transition-all duration-300 ${status === "success"
-                                            ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400"
-                                            : status === "error"
-                                                ? "bg-red-500/20 border border-red-500/40 text-red-400"
-                                                : "bg-[#C5A880] hover:bg-[#D4B996] text-[#070D0A] shadow-lg shadow-[#C5A880]/10"
+                                        ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400"
+                                        : status === "error"
+                                            ? "bg-red-500/20 border border-red-500/40 text-red-400"
+                                            : "bg-[#C5A880] hover:bg-[#D4B996] text-[#070D0A] shadow-lg shadow-[#C5A880]/10"
                                         }`}
                                 >
                                     {isEntrySaving ? (
@@ -105,6 +137,56 @@ export const StoryTimelineEditor: React.FC<StoryTimelineEditorProps> = ({
 
                             {/* Form Fields */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Media Section */}
+                                <div className="md:col-span-2">
+                                    <div className="border border-[#C5A880]/10 rounded-3xl bg-[#070D0A]/35 overflow-hidden">
+                                        <div className="p-5 border-b border-[#C5A880]/10 flex items-center justify-between bg-[#C5A880]/5">
+                                            <div className="flex flex-col">
+                                                <label className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">Timeline Image</label>
+                                                <p className="text-[8px] text-[#9CA3AF] uppercase tracking-widest mt-0.5">Supporting visual for this milestone</p>
+                                            </div>
+                                            <button
+                                                onClick={() => onMediaPickerOpen(entry.id, "image_id", `Timeline Entry ${entry.year_label}`)}
+                                                className="bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] px-4 py-2 rounded-xl transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-[#C5A880]/10"
+                                            >
+                                                <ImageIcon className="w-3.5 h-3.5" />
+                                                <span>Change</span>
+                                            </button>
+                                        </div>
+                                        <div className="p-5">
+                                            <div className="h-48 w-full bg-[#050806] rounded-2xl overflow-hidden border border-[#C5A880]/10 flex items-center justify-center relative group/img">
+                                                {entry.image_url ? (
+                                                    <>
+                                                        <img src={getFullImageUrl(entry.image_url)} className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105" alt={entry.title} />
+                                                        <div className="absolute inset-0 bg-[#070D0A]/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <button
+                                                                onClick={() => onMediaPickerOpen(entry.id, "image_id", `Timeline Entry ${entry.year_label}`)}
+                                                                className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-full hover:bg-white/20 transition-all"
+                                                            >
+                                                                <ImageIcon className="w-5 h-5" />
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center p-8 flex flex-col items-center gap-3">
+                                                        <div className="w-12 h-12 rounded-full bg-[#C5A880]/5 border border-[#C5A880]/10 flex items-center justify-center">
+                                                            <ImageIcon className="w-6 h-6 text-[#C5A880]/20" />
+                                                        </div>
+                                                        <p className="text-[10px] text-[#9CA3AF] uppercase tracking-[0.2em] font-light">No Image Selected</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {entry.image_id && (
+                                                <div className="mt-4 flex items-center justify-center gap-2">
+                                                    <span className="w-1 h-1 rounded-full bg-[#C5A880]"></span>
+                                                    <p className="text-[9px] text-[#C5A880]/60 uppercase tracking-[0.2em] font-medium">Asset ID: {entry.image_id}</p>
+                                                    <span className="w-1 h-1 rounded-full bg-[#C5A880]"></span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="space-y-3">
                                     <label className="block text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
                                         Year Label

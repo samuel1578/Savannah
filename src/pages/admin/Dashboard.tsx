@@ -286,6 +286,42 @@ const HOMEPAGE_IMAGE_FIELDS: Record<string, HomepageImageFieldConfig[]> = {
     ]
 };
 
+const ABOUT_PAGE_IMAGE_FIELDS: Record<string, HomepageImageFieldConfig[]> = {
+    about_hero: [
+        {
+            fieldKey: "hero_image_id",
+            label: "About Hero Image",
+            description: "Main background image for the About page hero section."
+        },
+        {
+            fieldKey: "farms_image_id",
+            label: "About Farms Image",
+            description: "Banner image for the Our Farms section on the About page."
+        }
+    ],
+    about_story_timeline: [
+        {
+            fieldKey: "image_id",
+            label: "Timeline Entry Image",
+            description: "Supporting image for this specific timeline milestone."
+        }
+    ],
+    about_craftsmanship: [
+        {
+            fieldKey: "image_id",
+            label: "Craftsmanship Card Image",
+            description: "Visual representation of this craftsmanship process card."
+        }
+    ],
+    about_signature_collections: [
+        {
+            fieldKey: "main_image_id",
+            label: "Signature Collections Image",
+            description: "Main featured image for the Signature Collections section."
+        }
+    ]
+};
+
 export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
     const [activePage, setActivePage] = useState<CmsPageKey>("home");
@@ -300,6 +336,15 @@ export const Dashboard: React.FC = () => {
     const [homepageImageIds, setHomepageImageIds] = useState<Record<string, string>>({});
     const [homepageImagePreviewPaths, setHomepageImagePreviewPaths] = useState<Record<string, string>>({});
     const [activeHomepageImagePicker, setActiveHomepageImagePicker] = useState<HomepageImageFieldConfig | null>(null);
+
+    // About Page Media Picker State
+    const [isAboutMediaPickerOpen, setIsAboutMediaPickerOpen] = useState(false);
+    const [activeAboutImagePicker, setActiveAboutImagePicker] = useState<{
+        sectionKey: string;
+        fieldKey: string;
+        label: string;
+        itemId?: number; // For timeline or craftsmanship items
+    } | null>(null);
 
     const {
         homepageSections,
@@ -325,7 +370,11 @@ export const Dashboard: React.FC = () => {
         saveHero,
         saveStoryTimeline,
         saveCraftsmanshipCard,
-        saveSignatureCollection
+        saveSignatureCollection,
+        updateLocalHeroImage,
+        updateLocalTimelineImage,
+        updateLocalCraftsmanshipImage,
+        updateLocalSignatureImage
     } = useAboutPageCms();
 
     // Derived values based on active page
@@ -578,6 +627,28 @@ export const Dashboard: React.FC = () => {
             ...prev,
             [fieldKey]: selectedMedia.imagePath
         }));
+    };
+
+    const handleAboutImageSelect = (selectedMedia: MediaPickerSelection) => {
+        if (!activeAboutImagePicker) return;
+
+        const { sectionKey, fieldKey, itemId } = activeAboutImagePicker;
+        const nextImageId = selectedMedia.id;
+        const nextImageUrl = selectedMedia.imagePath;
+
+        // Specialized handling based on section
+        if (sectionKey === "about_hero") {
+            updateLocalHeroImage(fieldKey, nextImageId, nextImageUrl);
+        } else if (sectionKey === "about_story_timeline" && itemId !== undefined) {
+            updateLocalTimelineImage(itemId, nextImageId, nextImageUrl);
+        } else if (sectionKey === "about_craftsmanship" && itemId !== undefined) {
+            updateLocalCraftsmanshipImage(itemId, nextImageId, nextImageUrl);
+        } else if (sectionKey === "about_signature_collections") {
+            updateLocalSignatureImage(nextImageId, nextImageUrl);
+        }
+
+        setIsAboutMediaPickerOpen(false);
+        setActiveAboutImagePicker(null);
     };
 
     const handleSave = async () => {
@@ -1151,24 +1222,58 @@ export const Dashboard: React.FC = () => {
                                     timeline={storyTimeline}
                                     onSave={saveStoryTimeline}
                                     saving={saving}
+                                    onMediaPickerOpen={(itemId, fieldKey, label) => {
+                                        setActiveAboutImagePicker({
+                                            sectionKey: "about_story_timeline",
+                                            fieldKey,
+                                            label,
+                                            itemId
+                                        });
+                                        setIsAboutMediaPickerOpen(true);
+                                    }}
                                 />
                             ) : selectedVirtualKey === "about_hero" ? (
                                 <AboutHeroEditor
                                     hero={aboutHero}
                                     onSave={saveHero}
                                     saving={saving}
+                                    onMediaPickerOpen={(fieldKey, label) => {
+                                        setActiveAboutImagePicker({
+                                            sectionKey: "about_hero",
+                                            fieldKey,
+                                            label
+                                        });
+                                        setIsAboutMediaPickerOpen(true);
+                                    }}
                                 />
                             ) : selectedVirtualKey === "about_craftsmanship" ? (
                                 <CraftsmanshipEditor
                                     cards={craftsmanshipCards}
                                     onSave={saveCraftsmanshipCard}
                                     saving={saving}
+                                    onMediaPickerOpen={(itemId, fieldKey, label) => {
+                                        setActiveAboutImagePicker({
+                                            sectionKey: "about_craftsmanship",
+                                            fieldKey,
+                                            label,
+                                            itemId
+                                        });
+                                        setIsAboutMediaPickerOpen(true);
+                                    }}
                                 />
                             ) : selectedVirtualKey === "about_signature_collections" ? (
                                 <SignatureCollectionsEditor
                                     collections={signatureCollections}
                                     onSave={saveSignatureCollection}
                                     saving={saving}
+                                    onMediaPickerOpen={(fieldKey, label) => {
+                                        setActiveAboutImagePicker({
+                                            sectionKey: "about_signature_collections",
+                                            fieldKey,
+                                            label
+                                        });
+                                        setIsAboutMediaPickerOpen(true);
+                                    }}
                                 />
                             ) : selectedVirtualKey === "heritage_stories" ? (
                                 <div className="flex flex-col items-center justify-center py-20 text-center gap-4 bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl">
@@ -1345,6 +1450,26 @@ export const Dashboard: React.FC = () => {
                     : null}
                 title={activeHomepageImagePicker ? `Select ${activeHomepageImagePicker.label}` : "Select Homepage Image"}
                 subtitle={activeHomepageImagePicker?.description || "Choose one Media Library asset for this Homepage image location."}
+            />
+
+            <MediaPickerModal
+                isOpen={isAboutMediaPickerOpen}
+                onClose={() => {
+                    setIsAboutMediaPickerOpen(false);
+                    setActiveAboutImagePicker(null);
+                }}
+                onSelect={handleAboutImageSelect}
+                selectedMediaId={activeAboutImagePicker?.itemId
+                    ? (activeAboutImagePicker.sectionKey === "about_story_timeline"
+                        ? Number(storyTimeline.find(i => i.id === activeAboutImagePicker.itemId)?.image_id)
+                        : Number(craftsmanshipCards.find(i => i.id === activeAboutImagePicker.itemId)?.image_id))
+                    : activeAboutImagePicker?.sectionKey === "about_hero"
+                        ? Number(aboutHero?.[activeAboutImagePicker.fieldKey as keyof AboutHero])
+                        : activeAboutImagePicker?.sectionKey === "about_signature_collections"
+                            ? Number(signatureCollections[0]?.main_image_id)
+                            : null}
+                title={activeAboutImagePicker ? `Select ${activeAboutImagePicker.label}` : "Select Image"}
+                subtitle="Choose one Media Library asset for this About Page section."
             />
 
             {selectedMediaAsset && (

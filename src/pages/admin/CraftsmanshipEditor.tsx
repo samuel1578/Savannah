@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CraftsmanshipCard } from "../../services/aboutPageCmsService";
-import { Save, Loader2, CheckCircle2, AlertCircle, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle, Sparkles, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 
@@ -12,12 +12,14 @@ interface CraftsmanshipEditorProps {
     cards: CraftsmanshipCard[];
     onSave: (card: Partial<CraftsmanshipCard> & { id: number }) => Promise<any>;
     saving: boolean;
+    onMediaPickerOpen: (itemId: number, fieldKey: string, label: string) => void;
 }
 
 export const CraftsmanshipEditor: React.FC<CraftsmanshipEditorProps> = ({
     cards,
     onSave,
-    saving
+    saving,
+    onMediaPickerOpen
 }) => {
     console.log('Craftsmanship Data:', cards);
 
@@ -26,10 +28,23 @@ export const CraftsmanshipEditor: React.FC<CraftsmanshipEditorProps> = ({
     const [activeIndex, setActiveIndex] = useState(0);
 
     useEffect(() => {
-        setLocalCards(cards);
+        setLocalCards(prev => {
+            if (prev.length === 0) return cards;
+            return cards.map(incoming => {
+                const existing = prev.find(p => p.id === incoming.id);
+                if (existing) {
+                    return {
+                        ...existing,
+                        image_id: incoming.image_id,
+                        image_url: incoming.image_url
+                    };
+                }
+                return incoming;
+            });
+        });
     }, [cards]);
 
-    const handleInputChange = (id: number, field: keyof CraftsmanshipCard, value: string) => {
+    const handleInputChange = (id: number, field: string, value: any) => {
         setLocalCards(prev => prev.map(card =>
             card.id === id ? { ...card, [field]: value } : card
         ));
@@ -45,6 +60,7 @@ export const CraftsmanshipEditor: React.FC<CraftsmanshipEditorProps> = ({
                 id: card.id,
                 heading: card.heading,
                 body_content: card.body_content,
+                image_id: card.image_id,
                 status: card.status
             });
             setSaveStatus(prev => ({ ...prev, [id]: "success" }));
@@ -55,6 +71,12 @@ export const CraftsmanshipEditor: React.FC<CraftsmanshipEditorProps> = ({
             console.error(`Error saving craftsmanship card ${id}:`, err);
             setSaveStatus(prev => ({ ...prev, [id]: "error" }));
         }
+    };
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        return `https://savannahdrinks.co.uk${path.startsWith("/") ? "" : "/"}${path}`;
     };
 
     if (!cards || cards.length === 0) {
@@ -139,6 +161,54 @@ export const CraftsmanshipEditor: React.FC<CraftsmanshipEditorProps> = ({
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-8">
+                                        {/* Media Section */}
+                                        <div className="border border-[#C5A880]/10 rounded-3xl bg-[#070D0A]/35 overflow-hidden">
+                                            <div className="p-5 border-b border-[#C5A880]/10 flex items-center justify-between bg-[#C5A880]/5">
+                                                <div className="flex flex-col">
+                                                    <label className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">Process Image</label>
+                                                    <p className="text-[8px] text-[#9CA3AF] uppercase tracking-widest mt-0.5">Visual for {card.heading || "this step"}</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => onMediaPickerOpen(card.id, "image_id", `Craftsmanship Card ${index + 1}`)}
+                                                    className="bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] px-4 py-2 rounded-xl transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-[#C5A880]/10"
+                                                >
+                                                    <ImageIcon className="w-3.5 h-3.5" />
+                                                    <span>Change</span>
+                                                </button>
+                                            </div>
+                                            <div className="p-5">
+                                                <div className="h-56 w-full bg-[#050806] rounded-2xl overflow-hidden border border-[#C5A880]/10 flex items-center justify-center relative group/img">
+                                                    {card.image_url ? (
+                                                        <>
+                                                            <img src={getFullImageUrl(card.image_url)} className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105" alt={card.heading} />
+                                                            <div className="absolute inset-0 bg-[#070D0A]/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                                                <button
+                                                                    onClick={() => onMediaPickerOpen(card.id, "image_id", `Craftsmanship Card ${index + 1}`)}
+                                                                    className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-3 rounded-full hover:bg-white/20 transition-all"
+                                                                >
+                                                                    <ImageIcon className="w-5 h-5" />
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <div className="text-center p-8 flex flex-col items-center gap-3">
+                                                            <div className="w-12 h-12 rounded-full bg-[#C5A880]/5 border border-[#C5A880]/10 flex items-center justify-center">
+                                                                <ImageIcon className="w-6 h-6 text-[#C5A880]/20" />
+                                                            </div>
+                                                            <p className="text-[10px] text-[#9CA3AF] uppercase tracking-[0.2em] font-light">No Image Selected</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {card.image_id && (
+                                                    <div className="mt-4 flex items-center justify-center gap-2">
+                                                        <span className="w-1 h-1 rounded-full bg-[#C5A880]"></span>
+                                                        <p className="text-[9px] text-[#C5A880]/60 uppercase tracking-[0.2em] font-medium">Asset ID: {card.image_id}</p>
+                                                        <span className="w-1 h-1 rounded-full bg-[#C5A880]"></span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
                                         <div className="space-y-3">
                                             <label className="block text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
                                                 Card Heading

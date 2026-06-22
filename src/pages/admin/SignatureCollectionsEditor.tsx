@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { SignatureCollection } from "../../services/aboutPageCmsService";
-import { Save, Loader2, CheckCircle2, AlertCircle, Layers } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle, Layers, ImageIcon } from "lucide-react";
 
 interface SignatureCollectionsEditorProps {
     collections: SignatureCollection[];
     onSave: (collection: Partial<SignatureCollection> & { id: number }) => Promise<any>;
     saving: boolean;
+    onMediaPickerOpen: (fieldKey: string, label: string) => void;
 }
 
 export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProps> = ({
     collections,
     onSave,
-    saving
+    saving,
+    onMediaPickerOpen
 }) => {
     console.log('Signature Collections:', collections);
 
@@ -20,13 +22,26 @@ export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProp
     const [saveStatus, setSaveStatus] = useState<Record<number, "idle" | "saving" | "success" | "error">>({});
 
     useEffect(() => {
-        setLocalCollections(collections);
+        setLocalCollections(prev => {
+            if (prev.length === 0) return collections;
+            return collections.map(incoming => {
+                const existing = prev.find(p => p.id === incoming.id);
+                if (existing) {
+                    return {
+                        ...existing,
+                        main_image_id: incoming.main_image_id,
+                        main_image_url: incoming.main_image_url
+                    };
+                }
+                return incoming;
+            });
+        });
         if (collections.length > 0 && !collections.find(c => c.id === activeTab)) {
             setActiveTab(collections[0].id);
         }
     }, [collections]);
 
-    const handleInputChange = (id: number, field: keyof SignatureCollection, value: string) => {
+    const handleInputChange = (id: number, field: string, value: any) => {
         setLocalCollections(prev => prev.map(item =>
             item.id === id ? { ...item, [field]: value } : item
         ));
@@ -42,6 +57,7 @@ export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProp
                 id: item.id,
                 tab_title: item.tab_title,
                 tab_content: item.tab_content,
+                main_image_id: item.main_image_id,
                 status: item.status
             });
             setSaveStatus(prev => ({ ...prev, [id]: "success" }));
@@ -52,6 +68,12 @@ export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProp
             console.error(`Error saving signature collection ${id}:`, err);
             setSaveStatus(prev => ({ ...prev, [id]: "error" }));
         }
+    };
+
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (/^https?:\/\//i.test(path)) return path;
+        return `https://savannahdrinks.co.uk${path.startsWith("/") ? "" : "/"}${path}`;
     };
 
     if (!collections || collections.length === 0) {
@@ -77,6 +99,38 @@ export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProp
                 </div>
             </div>
 
+            {/* Media Section - Global for the whole collection module */}
+            <div className="border border-[#C5A880]/10 rounded-3xl bg-[#0B1510]/50 overflow-hidden">
+                <div className="p-6 border-b border-[#C5A880]/10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h3 className="text-lg font-serif font-light text-[#F3F4F6]">Featured Collections Image</h3>
+                        <p className="text-xs text-[#9CA3AF] font-light mt-1">Main image displayed at the bottom of the signature collections section.</p>
+                    </div>
+                    <button
+                        onClick={() => onMediaPickerOpen("main_image_id", "Signature Collections Image")}
+                        className="bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs tracking-widest uppercase font-bold transition-all shadow-lg shadow-[#C5A880]/10"
+                    >
+                        <ImageIcon className="w-4 h-4" />
+                        <span>Change Image</span>
+                    </button>
+                </div>
+                <div className="p-6">
+                    <div className="h-64 w-full bg-[#050806] rounded-2xl overflow-hidden border border-[#C5A880]/10 flex items-center justify-center">
+                        {activeItem.main_image_url ? (
+                            <img src={getFullImageUrl(activeItem.main_image_url)} className="w-full h-full object-cover" alt="Collections" />
+                        ) : (
+                            <div className="text-center p-4">
+                                <ImageIcon className="w-12 h-12 text-[#C5A880]/10 mx-auto mb-3" />
+                                <p className="text-sm text-[#9CA3AF] uppercase tracking-widest font-light">No Featured Image Selected</p>
+                            </div>
+                        )}
+                    </div>
+                    {activeItem.main_image_id && (
+                        <p className="text-[10px] text-[#C5A880] uppercase tracking-widest mt-4 text-center">Media ID: {activeItem.main_image_id} (Shared across all collection tabs)</p>
+                    )}
+                </div>
+            </div>
+
             {/* Tabs Navigation */}
             <div className="flex p-1.5 bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-2xl w-fit">
                 {localCollections.map((item) => (
@@ -84,8 +138,8 @@ export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProp
                         key={item.id}
                         onClick={() => setActiveTab(item.id)}
                         className={`px-6 py-2.5 rounded-xl text-xs tracking-widest uppercase transition-all duration-300 ${activeTab === item.id
-                                ? "bg-[#C5A880] text-[#070D0A] font-bold shadow-lg"
-                                : "text-[#F3F4F6]/40 hover:text-[#F3F4F6] hover:bg-white/5"
+                            ? "bg-[#C5A880] text-[#070D0A] font-bold shadow-lg"
+                            : "text-[#F3F4F6]/40 hover:text-[#F3F4F6] hover:bg-white/5"
                             }`}
                     >
                         {item.tab_title || `Collection ${item.id}`}
@@ -110,10 +164,10 @@ export const SignatureCollectionsEditor: React.FC<SignatureCollectionsEditorProp
                         onClick={() => handleSaveCollection(activeItem.id)}
                         disabled={saving || saveStatus[activeItem.id] === "saving"}
                         className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs tracking-widest uppercase font-medium transition-all duration-300 ${saveStatus[activeItem.id] === "success"
-                                ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400"
-                                : saveStatus[activeItem.id] === "error"
-                                    ? "bg-red-500/20 border border-red-500/40 text-red-400"
-                                    : "bg-[#C5A880] hover:bg-[#D4B996] text-[#070D0A] shadow-lg shadow-[#C5A880]/10"
+                            ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400"
+                            : saveStatus[activeItem.id] === "error"
+                                ? "bg-red-500/20 border border-red-500/40 text-red-400"
+                                : "bg-[#C5A880] hover:bg-[#D4B996] text-[#070D0A] shadow-lg shadow-[#C5A880]/10"
                             }`}
                     >
                         {saveStatus[activeItem.id] === "saving" ? (

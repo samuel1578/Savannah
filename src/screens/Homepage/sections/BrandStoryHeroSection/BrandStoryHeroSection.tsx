@@ -12,10 +12,10 @@ interface BrandStoryHeroSectionProps {
 export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSectionProps): JSX.Element => {
   // Helper to get field value
   const getField = (key: string, fallback: string) => {
-    return data?.fields.find(f => f.key === key)?.value || fallback;
+    return data?.fields.find(f => f.key === key)?.value ?? fallback;
   };
 
-  const chapterMarker = data?.chapter_marker || "01 — Story";
+  const chapterMarker = data?.chapter_marker ?? "01 — Story";
   const storyTitleLines = [
     getField("hero_headline_line_1", "every"),
     getField("hero_headline_line_2", "bottle"),
