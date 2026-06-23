@@ -28,6 +28,7 @@ try {
             year_label = ?,
             title = ?,
             story_content = ?,
+            image_id = ?,
             status = ?,
             updated_at = NOW()
         WHERE id = ?
@@ -37,6 +38,7 @@ try {
         $input['year_label'] ?? '',
         $input['title'] ?? '',
         $input['story_content'] ?? '',
+        $input['image_id'] ?? null,
         $input['status'] ?? 'published',
         $timelineId
     ]);

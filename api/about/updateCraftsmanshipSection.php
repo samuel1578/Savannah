@@ -27,6 +27,7 @@ try {
         SET
             heading = ?,
             body_content = ?,
+            image_id = ?,
             status = ?,
             updated_at = NOW()
         WHERE id = ?
@@ -35,6 +36,7 @@ try {
     $stmt->execute([
         $input['heading'] ?? '',
         $input['body_content'] ?? '',
+        $input['image_id'] ?? null,
         $input['status'] ?? 'published',
         $cardId
     ]);

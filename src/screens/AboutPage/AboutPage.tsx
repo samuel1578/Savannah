@@ -27,16 +27,28 @@ import storyGoldenSpice from "../../assets/heritage.jpg";
 import storyManWorkshop from "../../assets/story-man-workshop-interior.jpeg";
 import storyTeamTasting from "../../assets/story-team-tasting-labcoats.jpg";
 
+const getFullImageUrl = (path: string) => {
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+    return `https://savannahdrinks.co.uk/${path}`;
+};
+
 export const HeroSection = ({ data }: { data?: any }): JSX.Element => {
     const headline1 = data?.hero_title || "the savannah";
     const headline2 = ""; // Assuming title contains everything or we split it
     const description = data?.hero_subtitle || "Inspired by heritage, crafted with passion, and shared with the world.";
 
+    // Resolve Hero Image from CMS
+    const cmsHeroImageUrl = data?.hero_image_url || "";
+    const cmsHeroImageAlt = data?.hero_image_alt || "About Savannah";
+    const displayHeroImage = cmsHeroImageUrl ? getFullImageUrl(cmsHeroImageUrl) : aboutHero;
+
     return (
         <div className="relative w-full min-h-[500px] sm:min-h-[600px] lg:min-h-[700px] flex items-center justify-center overflow-hidden hero-section reveal-section">
             <img
-                src={aboutHero}
-                alt="About Savannah"
+                src={displayHeroImage}
+                alt={cmsHeroImageAlt}
                 className="absolute inset-0 w-full h-full object-cover reveal-image hero-bottle"
             />
             <div className="absolute inset-0 bg-black/30" />
@@ -93,8 +105,8 @@ export const OurStorySection = ({ timeline }: { timeline: any[] }): JSX.Element 
                         {/* Image */}
                         <div className="w-full md:w-[45%] aspect-[4/3] md:aspect-auto md:h-[429px] overflow-hidden relative">
                             <img
-                                src={images[index % images.length]}
-                                alt={row.title}
+                                src={row.image_url ? getFullImageUrl(row.image_url) : images[index % images.length]}
+                                alt={row.image_alt || row.title}
                                 className="w-full h-full object-cover reveal-image"
                             />
                         </div>
@@ -171,8 +183,8 @@ export const CraftsmanshipSection = ({ cards }: { cards: any[] }): JSX.Element =
                             <div className="flex flex-col space-y-6 pb-2 craft-card">
                                 <div className="aspect-[4/5] overflow-hidden relative">
                                     <img
-                                        src={images[i % images.length]}
-                                        alt={card.heading}
+                                        src={card.image_url ? getFullImageUrl(card.image_url) : images[i % images.length]}
+                                        alt={card.image_alt || card.heading}
                                         className="w-full h-full object-cover reveal-image"
                                     />
                                 </div>
@@ -721,7 +733,10 @@ export const AboutPage = (): JSX.Element => {
 
             <section className="w-full">
                 <div className="farm-banner w-full relative">
-                    <OurFarmsSection image={aboutFarms} data={getHomeData("farms_banner")} />
+                    <OurFarmsSection
+                        image={hero?.farms_image_url ? getFullImageUrl(hero.farms_image_url) : aboutFarms}
+                        data={getHomeData("farms_banner")}
+                    />
                 </div>
             </section>
 

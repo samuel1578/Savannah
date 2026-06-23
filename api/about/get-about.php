@@ -27,6 +27,59 @@ try {
 
     /*
     |--------------------------------------------------------------------------
+    | Resolve Hero Image
+    |--------------------------------------------------------------------------
+    */
+
+    if (!empty($hero['hero_image_id'])) {
+
+        $mediaStmt = $db->prepare("
+            SELECT file_path, alt_text
+            FROM media_assets
+            WHERE id = ?
+        ");
+
+        $mediaStmt->execute([$hero['hero_image_id']]);
+
+        $media = $mediaStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($media) {
+
+            $hero['hero_image_url'] = $media['file_path'];
+            $hero['hero_image_alt'] = $media['alt_text'];
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resolve Farms Image
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        isset($hero['farms_image_id']) &&
+        !empty($hero['farms_image_id'])
+    ) {
+
+        $mediaStmt = $db->prepare("
+            SELECT file_path, alt_text
+            FROM media_assets
+            WHERE id = ?
+        ");
+
+        $mediaStmt->execute([$hero['farms_image_id']]);
+
+        $media = $mediaStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($media) {
+
+            $hero['farms_image_url'] = $media['file_path'];
+            $hero['farms_image_alt'] = $media['alt_text'];
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | STORY TIMELINE
     |--------------------------------------------------------------------------
     */
@@ -39,6 +92,39 @@ try {
     ");
 
     $storyTimeline = $timelineStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resolve Timeline Images
+    |--------------------------------------------------------------------------
+    */
+
+    foreach ($storyTimeline as &$item) {
+
+        if (
+            isset($item['image_id']) &&
+            !empty($item['image_id'])
+        ) {
+
+            $mediaStmt = $db->prepare("
+                SELECT file_path, alt_text
+                FROM media_assets
+                WHERE id = ?
+            ");
+
+            $mediaStmt->execute([$item['image_id']]);
+
+            $media = $mediaStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($media) {
+
+                $item['image_url'] = $media['file_path'];
+                $item['image_alt'] = $media['alt_text'];
+            }
+        }
+    }
+
+    unset($item);
 
     /*
     |--------------------------------------------------------------------------
@@ -57,6 +143,36 @@ try {
 
     /*
     |--------------------------------------------------------------------------
+    | Resolve Craftsmanship Images
+    |--------------------------------------------------------------------------
+    */
+
+    foreach ($craftsmanshipCards as &$card) {
+
+        if (!empty($card['image_id'])) {
+
+            $mediaStmt = $db->prepare("
+                SELECT file_path, alt_text
+                FROM media_assets
+                WHERE id = ?
+            ");
+
+            $mediaStmt->execute([$card['image_id']]);
+
+            $media = $mediaStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($media) {
+
+                $card['image_url'] = $media['file_path'];
+                $card['image_alt'] = $media['alt_text'];
+            }
+        }
+    }
+
+    unset($card);
+
+    /*
+    |--------------------------------------------------------------------------
     | SIGNATURE COLLECTIONS
     |--------------------------------------------------------------------------
     */
@@ -69,6 +185,39 @@ try {
     ");
 
     $signatureCollections = $collectionsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resolve Collection Images
+    |--------------------------------------------------------------------------
+    */
+
+    foreach ($signatureCollections as &$collection) {
+
+        if (
+            isset($collection['main_image_id']) &&
+            !empty($collection['main_image_id'])
+        ) {
+
+            $mediaStmt = $db->prepare("
+                SELECT file_path, alt_text
+                FROM media_assets
+                WHERE id = ?
+            ");
+
+            $mediaStmt->execute([$collection['main_image_id']]);
+
+            $media = $mediaStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($media) {
+
+                $collection['main_image_url'] = $media['file_path'];
+                $collection['main_image_alt'] = $media['alt_text'];
+            }
+        }
+    }
+
+    unset($collection);
 
     /*
     |--------------------------------------------------------------------------

@@ -1,6 +1,13 @@
 import { useState } from "react";
 import colImage from "../../assets/col.jpg";
 
+const getFullImageUrl = (path: string) => {
+    if (!path) return "";
+    if (/^https?:\/\//i.test(path)) return path;
+    if (path.startsWith("/")) return `https://savannahdrinks.co.uk${path}`;
+    return `https://savannahdrinks.co.uk/${path}`;
+};
+
 export const SignatureCollectionsSection = ({ collections }: { collections: any[] }): JSX.Element => {
     const headline = "signature savannah collections";
 
@@ -9,6 +16,10 @@ export const SignatureCollectionsSection = ({ collections }: { collections: any[
     const handleTabClick = (id: number) => {
         setOpenTab((prev) => (prev === id ? null : id));
     };
+
+    const activeCollection = collections.find(c => c.id === openTab);
+    const displayImage = activeCollection?.main_image_url ? getFullImageUrl(activeCollection.main_image_url) : colImage;
+    const displayAlt = activeCollection?.main_image_alt || "Savannah Collections";
 
     return (
         <div style={{ width: "100%", backgroundColor: "#ffffff" }} className="collections-section reveal-section">
@@ -133,8 +144,8 @@ export const SignatureCollectionsSection = ({ collections }: { collections: any[
             {/* Bottle Image */}
             <img
                 className="sig-bottle-image"
-                src={colImage}
-                alt="Savannah Collections"
+                src={displayImage}
+                alt={displayAlt}
             />
         </div>
     );

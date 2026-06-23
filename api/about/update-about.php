@@ -27,6 +27,8 @@ try {
         SET
             hero_title = ?,
             hero_subtitle = ?,
+            hero_image_id = ?,
+            farms_image_id = ?,
             status = ?,
             updated_at = NOW()
         WHERE id = ?
@@ -35,6 +37,8 @@ try {
     $stmt->execute([
         $input['hero_title'] ?? '',
         $input['hero_subtitle'] ?? '',
+        $input['hero_image_id'] ?? null,
+        $input['farms_image_id'] ?? null,
         $input['status'] ?? 'published',
         $sectionId
     ]);
