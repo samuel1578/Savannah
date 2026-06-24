@@ -10,6 +10,7 @@ import { StoryTimelineEditor } from "./StoryTimelineEditor";
 import { CraftsmanshipEditor } from "./CraftsmanshipEditor";
 import { SignatureCollectionsEditor } from "./SignatureCollectionsEditor";
 import { AboutHeroEditor } from "./AboutHeroEditor";
+import { BlogModule } from "./modules/BlogModule";
 import { MediaPickerModal, MediaPickerSelection } from "./MediaPickerModal";
 import logoLight from "../../assets/logo-light.png";
 import styles from "./Dashboard.module.css";
@@ -217,7 +218,7 @@ type CmsPageType = "content" | "tool";
 const PAGE_TYPES: Record<CmsPageKey, CmsPageType> = {
     home: "content",
     about: "content",
-    blog: "content",
+    blog: "tool",
     contact: "content",
     "media-library": "tool",
     "global-settings": "tool"
@@ -865,9 +866,16 @@ export const Dashboard: React.FC = () => {
                                 {!isNavCollapsed && <span>Media Library</span>}
                             </button>
 
+                            <button
+                                onClick={() => setActivePage("blog")}
+                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "blog" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
+                            >
+                                <BookOpen className="w-4 h-4" />
+                                {!isNavCollapsed && <span>Our Blog</span>}
+                            </button>
+
                             {/* Disabled placeholders */}
                             {[
-                                { label: "Our Blog", icon: BookOpen },
                                 { label: "Contact Us", icon: Mail },
                                 { label: "Global Settings", icon: Settings }
                             ].map((item, index) => (
@@ -960,482 +968,486 @@ export const Dashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* MAIN CONTENT AREA: EDITOR (Priority 60-70% width) */}
-                <main
-                    ref={mainContentRef}
-                    className={`flex-1 overflow-y-auto p-8 lg:p-12 flex flex-col gap-8 customScrollbar ${styles.editorArea}`}
-                >
-                    {/* Top Header Bar */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#C5A880]/10 pb-8">
-                        <div className="flex items-center gap-4">
-                            {showStructureSidebar && isStructureCollapsed && (
-                                <button
-                                    onClick={() => setIsStructureCollapsed(false)}
-                                    className="p-2.5 bg-[#C5A880]/10 border border-[#C5A880]/20 rounded-2xl text-[#C5A880] hover:bg-[#C5A880]/20 transition-all flex items-center gap-2 group shadow-lg"
-                                >
-                                    <Layers className="w-4 h-4" />
-                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                                </button>
-                            )}
-                            <div>
-                                <h1 className="text-4xl lg:text-5xl font-serif font-light text-[#F3F4F6] tracking-wide">
-                                    {isMediaLibrary ? "Media Library" : "Editor"}
-                                </h1>
-                                <p className="text-[#9CA3AF] text-sm font-light leading-relaxed mt-1">
-                                    {isMediaLibrary
-                                        ? "Manage visual assets used throughout the Savannah Water website."
-                                        : selectedVirtualKey
-                                            ? (VIRTUAL_SECTIONS[selectedVirtualKey]?.name || ABOUT_SECTION_METADATA[selectedVirtualKey]?.name || "Specialized Editor")
-                                            : (selectedSection
-                                                ? (SECTION_METADATA[selectedSection.section_key]?.name || formatFieldLabel(selectedSection.section_key))
-                                                : "Select a section to begin")}
-                                </p>
+                {activePage === "blog" ? (
+                    <BlogModule />
+                ) : (
+                    /* MAIN CONTENT AREA: EDITOR (Priority 60-70% width) */
+                    <main
+                        ref={mainContentRef}
+                        className={`flex-1 overflow-y-auto p-8 lg:p-12 flex flex-col gap-8 customScrollbar ${styles.editorArea}`}
+                    >
+                        {/* Top Header Bar */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#C5A880]/10 pb-8">
+                            <div className="flex items-center gap-4">
+                                {showStructureSidebar && isStructureCollapsed && (
+                                    <button
+                                        onClick={() => setIsStructureCollapsed(false)}
+                                        className="p-2.5 bg-[#C5A880]/10 border border-[#C5A880]/20 rounded-2xl text-[#C5A880] hover:bg-[#C5A880]/20 transition-all flex items-center gap-2 group shadow-lg"
+                                    >
+                                        <Layers className="w-4 h-4" />
+                                        <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                                    </button>
+                                )}
+                                <div>
+                                    <h1 className="text-4xl lg:text-5xl font-serif font-light text-[#F3F4F6] tracking-wide">
+                                        {isMediaLibrary ? "Media Library" : "Editor"}
+                                    </h1>
+                                    <p className="text-[#9CA3AF] text-sm font-light leading-relaxed mt-1">
+                                        {isMediaLibrary
+                                            ? "Manage visual assets used throughout the Savannah Water website."
+                                            : selectedVirtualKey
+                                                ? (VIRTUAL_SECTIONS[selectedVirtualKey]?.name || ABOUT_SECTION_METADATA[selectedVirtualKey]?.name || "Specialized Editor")
+                                                : (selectedSection
+                                                    ? (SECTION_METADATA[selectedSection.section_key]?.name || formatFieldLabel(selectedSection.section_key))
+                                                    : "Select a section to begin")}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Active indicator */}
+                            <div className="flex items-center gap-2 bg-emerald-950/30 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-300 text-[10px] tracking-widest uppercase font-light">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>{isMediaLibrary ? "MEDIA LIBRARY" : "Live Sync Active"}</span>
                             </div>
                         </div>
 
-                        {/* Active indicator */}
-                        <div className="flex items-center gap-2 bg-emerald-950/30 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-300 text-[10px] tracking-widest uppercase font-light">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>{isMediaLibrary ? "MEDIA LIBRARY" : "Live Sync Active"}</span>
-                        </div>
-                    </div>
+                        {/* LOADING SKELETON STATE */}
+                        {loading ? (
+                            <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
+                                <Loader2 className="w-10 h-10 text-[#C5A880] animate-spin mb-4" />
+                                <p className="text-xs font-light tracking-[0.2em] text-[#C5A880] uppercase animate-pulse">
+                                    Retrieving {isHome ? "Homepage" : "About Us"} Structures...
+                                </p>
+                            </div>
+                        ) : error ? (
+                            /* BRANDED ERROR STATE */
+                            <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] border border-red-500/20 bg-red-950/10 rounded-2xl p-8 max-w-xl mx-auto text-center">
+                                <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+                                <h3 className="text-xl font-serif font-light text-red-200">System Connection Failure</h3>
+                                <p className="text-sm font-light text-red-400/80 leading-relaxed mt-2">
+                                    {error}
+                                </p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="mt-6 bg-red-950/30 hover:bg-red-950/50 border border-red-500/30 text-red-300 text-xs tracking-wider uppercase px-6 py-3 rounded-xl transition-all duration-300"
+                                >
+                                    Retry Connection
+                                </button>
+                            </div>
+                        ) : (
+                            <div className={`flex flex-col gap-8 relative ${isMediaLibrary ? "w-full max-w-none" : "max-w-5xl"}`}>
+                                {sectionLoading ? (
+                                    <div className="absolute inset-0 bg-[#070D0A]/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20">
+                                        <Loader2 className="w-8 h-8 text-[#C5A880] animate-spin mb-2" />
+                                        <span className="text-xs font-light tracking-widest text-[#C5A880] uppercase">
+                                            Loading Section Data...
+                                        </span>
+                                    </div>
+                                ) : null}
 
-                    {/* LOADING SKELETON STATE */}
-                    {loading ? (
-                        <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
-                            <Loader2 className="w-10 h-10 text-[#C5A880] animate-spin mb-4" />
-                            <p className="text-xs font-light tracking-[0.2em] text-[#C5A880] uppercase animate-pulse">
-                                Retrieving {isHome ? "Homepage" : "About Us"} Structures...
-                            </p>
-                        </div>
-                    ) : error ? (
-                        /* BRANDED ERROR STATE */
-                        <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] border border-red-500/20 bg-red-950/10 rounded-2xl p-8 max-w-xl mx-auto text-center">
-                            <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
-                            <h3 className="text-xl font-serif font-light text-red-200">System Connection Failure</h3>
-                            <p className="text-sm font-light text-red-400/80 leading-relaxed mt-2">
-                                {error}
-                            </p>
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="mt-6 bg-red-950/30 hover:bg-red-950/50 border border-red-500/30 text-red-300 text-xs tracking-wider uppercase px-6 py-3 rounded-xl transition-all duration-300"
-                            >
-                                Retry Connection
-                            </button>
-                        </div>
-                    ) : (
-                        <div className={`flex flex-col gap-8 relative ${isMediaLibrary ? "w-full max-w-none" : "max-w-5xl"}`}>
-                            {sectionLoading ? (
-                                <div className="absolute inset-0 bg-[#070D0A]/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20">
-                                    <Loader2 className="w-8 h-8 text-[#C5A880] animate-spin mb-2" />
-                                    <span className="text-xs font-light tracking-widest text-[#C5A880] uppercase">
-                                        Loading Section Data...
-                                    </span>
-                                </div>
-                            ) : null}
-
-                            {isMediaLibrary ? (
-                                <div className="flex flex-col gap-8">
-                                    {/* Upload Area */}
-                                    <section className="bg-[#0B1510]/50 border border-dashed border-[#C5A880]/25 rounded-3xl p-8 lg:p-10 shadow-2xl">
-                                        <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8 items-center">
-                                            <div className="flex flex-col gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-[#C5A880]/10 border border-[#C5A880]/20 flex items-center justify-center text-[#C5A880]">
-                                                    <UploadCloud className="w-5 h-5" />
+                                {isMediaLibrary ? (
+                                    <div className="flex flex-col gap-8">
+                                        {/* Upload Area */}
+                                        <section className="bg-[#0B1510]/50 border border-dashed border-[#C5A880]/25 rounded-3xl p-8 lg:p-10 shadow-2xl">
+                                            <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8 items-center">
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="w-12 h-12 rounded-2xl bg-[#C5A880]/10 border border-[#C5A880]/20 flex items-center justify-center text-[#C5A880]">
+                                                        <UploadCloud className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h2 className="text-2xl font-serif font-light tracking-wide text-[#F3F4F6]">
+                                                            Upload Area
+                                                        </h2>
+                                                        <p className="text-sm text-[#9CA3AF] font-light leading-relaxed mt-2 max-w-2xl">
+                                                            Add JPG, PNG, or WEBP assets to the live Savannah media library.
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col sm:flex-row gap-3">
+                                                        <input
+                                                            ref={mediaFileInputRef}
+                                                            type="file"
+                                                            accept="image/jpeg,image/png,image/webp"
+                                                            onChange={handleMediaFileChange}
+                                                            className="hidden"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => mediaFileInputRef.current?.click()}
+                                                            disabled={uploadStatus === "uploading"}
+                                                            className="inline-flex items-center justify-center gap-2 bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] text-[10px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            {uploadStatus === "uploading" ? (
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                            ) : (
+                                                                <UploadCloud className="w-4 h-4" />
+                                                            )}
+                                                            <span>{uploadStatus === "uploading" ? "Uploading..." : "Select Image"}</span>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={fetchMediaAssets}
+                                                            disabled={mediaLoading || uploadStatus === "uploading"}
+                                                            className="inline-flex items-center justify-center gap-2 bg-[#070D0A]/50 border border-[#C5A880]/20 hover:border-[#C5A880]/50 text-[#C5A880] text-[10px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            {mediaLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+                                                            <span>Refresh</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
+                                                <div className="bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-2xl p-5 text-center">
+                                                    <div className="flex justify-center mb-3">
+                                                        {uploadStatus === "uploading" ? (
+                                                            <Loader2 className="w-5 h-5 text-[#C5A880] animate-spin" />
+                                                        ) : uploadStatus === "success" ? (
+                                                            <CheckCircle2 className="w-5 h-5 text-emerald-300" />
+                                                        ) : uploadStatus === "error" ? (
+                                                            <AlertCircle className="w-5 h-5 text-red-300" />
+                                                        ) : (
+                                                            <UploadCloud className="w-5 h-5 text-[#C5A880]" />
+                                                        )}
+                                                    </div>
+                                                    <p className={`text-[10px] tracking-[0.2em] uppercase font-bold ${uploadStatus === "error" ? "text-red-300" : uploadStatus === "success" ? "text-emerald-300" : "text-[#C5A880]"}`}>
+                                                        {uploadStatus === "uploading" ? "Uploading" : uploadStatus === "success" ? "Upload Complete" : uploadStatus === "error" ? "Upload Error" : "Ready"}
+                                                    </p>
+                                                    <p className="text-xs text-[#9CA3AF] font-light leading-relaxed mt-2 break-words">
+                                                        {uploadMessage || "Connected to the live media API."}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        {/* Asset Grid */}
+                                        <section className="bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl p-6 lg:p-8 shadow-2xl flex flex-col gap-6">
+                                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#C5A880]/10 pb-6">
                                                 <div>
                                                     <h2 className="text-2xl font-serif font-light tracking-wide text-[#F3F4F6]">
-                                                        Upload Area
+                                                        Asset Grid
                                                     </h2>
-                                                    <p className="text-sm text-[#9CA3AF] font-light leading-relaxed mt-2 max-w-2xl">
-                                                        Add JPG, PNG, or WEBP assets to the live Savannah media library.
+                                                    <p className="text-xs text-[#9CA3AF] font-light mt-1">
+                                                        {mediaAssets.length} live assets available from the media library.
                                                     </p>
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row gap-3">
-                                                    <input
-                                                        ref={mediaFileInputRef}
-                                                        type="file"
-                                                        accept="image/jpeg,image/png,image/webp"
-                                                        onChange={handleMediaFileChange}
-                                                        className="hidden"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => mediaFileInputRef.current?.click()}
-                                                        disabled={uploadStatus === "uploading"}
-                                                        className="inline-flex items-center justify-center gap-2 bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] text-[10px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        {uploadStatus === "uploading" ? (
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                        ) : (
-                                                            <UploadCloud className="w-4 h-4" />
-                                                        )}
-                                                        <span>{uploadStatus === "uploading" ? "Uploading..." : "Select Image"}</span>
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={fetchMediaAssets}
-                                                        disabled={mediaLoading || uploadStatus === "uploading"}
-                                                        className="inline-flex items-center justify-center gap-2 bg-[#070D0A]/50 border border-[#C5A880]/20 hover:border-[#C5A880]/50 text-[#C5A880] text-[10px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        {mediaLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
-                                                        <span>Refresh</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-2xl p-5 text-center">
-                                                <div className="flex justify-center mb-3">
-                                                    {uploadStatus === "uploading" ? (
-                                                        <Loader2 className="w-5 h-5 text-[#C5A880] animate-spin" />
-                                                    ) : uploadStatus === "success" ? (
-                                                        <CheckCircle2 className="w-5 h-5 text-emerald-300" />
-                                                    ) : uploadStatus === "error" ? (
-                                                        <AlertCircle className="w-5 h-5 text-red-300" />
-                                                    ) : (
-                                                        <UploadCloud className="w-5 h-5 text-[#C5A880]" />
-                                                    )}
-                                                </div>
-                                                <p className={`text-[10px] tracking-[0.2em] uppercase font-bold ${uploadStatus === "error" ? "text-red-300" : uploadStatus === "success" ? "text-emerald-300" : "text-[#C5A880]"}`}>
-                                                    {uploadStatus === "uploading" ? "Uploading" : uploadStatus === "success" ? "Upload Complete" : uploadStatus === "error" ? "Upload Error" : "Ready"}
-                                                </p>
-                                                <p className="text-xs text-[#9CA3AF] font-light leading-relaxed mt-2 break-words">
-                                                    {uploadMessage || "Connected to the live media API."}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </section>
-
-                                    {/* Asset Grid */}
-                                    <section className="bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl p-6 lg:p-8 shadow-2xl flex flex-col gap-6">
-                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#C5A880]/10 pb-6">
-                                            <div>
-                                                <h2 className="text-2xl font-serif font-light tracking-wide text-[#F3F4F6]">
-                                                    Asset Grid
-                                                </h2>
-                                                <p className="text-xs text-[#9CA3AF] font-light mt-1">
-                                                    {mediaAssets.length} live assets available from the media library.
-                                                </p>
-                                            </div>
-                                            <div className="flex flex-col sm:flex-row gap-3">
-                                                <div className="flex items-center gap-2 bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-xl px-4 py-2.5 text-[#9CA3AF]">
-                                                    <Search className="w-4 h-4 text-[#C5A880]/70" />
-                                                    <span className="text-xs font-light">Search disabled</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-xl px-4 py-2.5 text-[#9CA3AF]">
-                                                    <Filter className="w-4 h-4 text-[#C5A880]/70" />
-                                                    <span className="text-xs font-light">All assets</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {mediaError ? (
-                                            <div className="flex items-center gap-3 bg-red-950/10 border border-red-500/20 rounded-2xl p-5 text-red-200">
-                                                <AlertCircle className="w-5 h-5 text-red-300 shrink-0" />
-                                                <p className="text-sm font-light">{mediaError}</p>
-                                            </div>
-                                        ) : null}
-
-                                        {mediaLoading ? (
-                                            <div className="min-h-[280px] flex flex-col items-center justify-center text-center">
-                                                <Loader2 className="w-10 h-10 text-[#C5A880] animate-spin mb-4" />
-                                                <p className="text-xs font-light tracking-[0.2em] text-[#C5A880] uppercase">
-                                                    Loading Media Assets...
-                                                </p>
-                                            </div>
-                                        ) : mediaAssets.length === 0 ? (
-                                            <div className="min-h-[260px] flex flex-col items-center justify-center text-center border border-[#C5A880]/10 rounded-3xl bg-[#070D0A]/30 p-8">
-                                                <ImageIcon className="w-12 h-12 text-[#C5A880]/20 mb-4" />
-                                                <h3 className="text-xl font-serif font-light text-[#F3F4F6]">No Media Assets</h3>
-                                                <p className="text-sm text-[#9CA3AF] font-light mt-2 max-w-sm">
-                                                    Upload a JPG, PNG, or WEBP image to begin building the live media library.
-                                                </p>
-                                            </div>
-                                        ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-                                                {mediaAssets.map((asset) => (
-                                                    <div
-                                                        key={asset.id}
-                                                        className="group bg-[#070D0A]/45 border border-[#C5A880]/10 hover:border-[#C5A880]/45 rounded-2xl overflow-hidden text-left transition-all duration-300 shadow-xl hover:-translate-y-0.5"
-                                                    >
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setSelectedMediaAsset(asset)}
-                                                            className="block w-full text-left"
-                                                        >
-                                                            <div className="aspect-[4/3] bg-[#050806] overflow-hidden relative">
-                                                                <img
-                                                                    src={getMediaAssetUrl(asset)}
-                                                                    alt={asset.alt_text || getMediaDisplayName(asset)}
-                                                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
-                                                                />
-                                                                <div className="absolute top-3 right-3 bg-[#070D0A]/80 border border-[#C5A880]/20 rounded-full px-2.5 py-1 text-[8px] tracking-widest uppercase text-[#C5A880]">
-                                                                    {asset.file_type}
-                                                                </div>
-                                                                <div className="absolute inset-0 bg-[#070D0A]/0 group-hover:bg-[#070D0A]/20 transition-colors flex items-center justify-center">
-                                                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-[#C5A880] text-[#070D0A] rounded-full p-2">
-                                                                        <Maximize2 className="w-4 h-4" />
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </button>
-                                                        <div className="p-4 flex flex-col gap-3">
-                                                            <div>
-                                                                <h3 className="text-sm font-serif tracking-wide text-[#F3F4F6] truncate">
-                                                                    {getMediaDisplayName(asset)}
-                                                                </h3>
-                                                                <p className="text-[10px] uppercase tracking-[0.15em] text-[#C5A880]/70 mt-1 truncate">
-                                                                    {asset.alt_text || "No alt text"}
-                                                                </p>
-                                                            </div>
-                                                            <div className="grid grid-cols-2 gap-2 text-[10px] text-[#9CA3AF] font-light">
-                                                                <span>{formatMediaFileSize(asset.file_size)}</span>
-                                                                <span className="text-right">{asset.created_at}</span>
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleMediaDelete(asset)}
-                                                                disabled={deletingMediaId === asset.id}
-                                                                className="flex items-center justify-center gap-2 border border-red-500/20 hover:border-red-400/40 text-red-300/70 hover:text-red-200 rounded-xl py-2 text-[9px] tracking-[0.16em] uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                                            >
-                                                                {deletingMediaId === asset.id ? (
-                                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                                                ) : (
-                                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                                )}
-                                                                <span>{deletingMediaId === asset.id ? "Deleting" : "Delete"}</span>
-                                                            </button>
-                                                        </div>
+                                                    <div className="flex items-center gap-2 bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-xl px-4 py-2.5 text-[#9CA3AF]">
+                                                        <Search className="w-4 h-4 text-[#C5A880]/70" />
+                                                        <span className="text-xs font-light">Search disabled</span>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </section>
-                                </div>
-                            ) : selectedVirtualKey === "products_showcase" ? (
-                                <ProductEditor
-                                    products={products}
-                                    onSave={handleProductSave}
-                                    saving={saving}
-                                />
-                            ) : selectedVirtualKey === "about_story_timeline" ? (
-                                <StoryTimelineEditor
-                                    timeline={storyTimeline}
-                                    onSave={saveStoryTimeline}
-                                    saving={saving}
-                                    onMediaPickerOpen={(itemId, fieldKey, label) => {
-                                        setActiveAboutImagePicker({
-                                            sectionKey: "about_story_timeline",
-                                            fieldKey,
-                                            label,
-                                            itemId
-                                        });
-                                        setIsAboutMediaPickerOpen(true);
-                                    }}
-                                />
-                            ) : selectedVirtualKey === "about_hero" ? (
-                                <AboutHeroEditor
-                                    hero={aboutHero}
-                                    onSave={saveHero}
-                                    saving={saving}
-                                    onMediaPickerOpen={(fieldKey, label) => {
-                                        setActiveAboutImagePicker({
-                                            sectionKey: "about_hero",
-                                            fieldKey,
-                                            label
-                                        });
-                                        setIsAboutMediaPickerOpen(true);
-                                    }}
-                                />
-                            ) : selectedVirtualKey === "about_craftsmanship" ? (
-                                <CraftsmanshipEditor
-                                    cards={craftsmanshipCards}
-                                    onSave={saveCraftsmanshipCard}
-                                    saving={saving}
-                                    onMediaPickerOpen={(itemId, fieldKey, label) => {
-                                        setActiveAboutImagePicker({
-                                            sectionKey: "about_craftsmanship",
-                                            fieldKey,
-                                            label,
-                                            itemId
-                                        });
-                                        setIsAboutMediaPickerOpen(true);
-                                    }}
-                                />
-                            ) : selectedVirtualKey === "about_signature_collections" ? (
-                                <SignatureCollectionsEditor
-                                    collections={signatureCollections}
-                                    onSave={saveSignatureCollection}
-                                    saving={saving}
-                                    onMediaPickerOpen={(fieldKey, label) => {
-                                        setActiveAboutImagePicker({
-                                            sectionKey: "about_signature_collections",
-                                            fieldKey,
-                                            label
-                                        });
-                                        setIsAboutMediaPickerOpen(true);
-                                    }}
-                                />
-                            ) : selectedVirtualKey === "heritage_stories" ? (
-                                <div className="flex flex-col items-center justify-center py-20 text-center gap-4 bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl">
-                                    <Sparkles className="w-12 h-12 text-[#C5A880]/20" />
-                                    <h3 className="text-xl font-serif font-light text-[#F3F4F6]">Heritage Stories Module</h3>
-                                    <p className="text-sm text-[#9CA3AF] max-w-xs font-light">
-                                        This specialized module for managing luxury brand stories is scheduled for Phase 3 implementation.
-                                    </p>
-                                </div>
-                            ) : selectedSection ? (
-                                <div className="bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl p-8 lg:p-10 flex flex-col gap-10 shadow-2xl">
-                                    {selectedHomepageImageFields.length > 0 && (
-                                        <div className="flex flex-col gap-5">
-                                            {selectedHomepageImageFields.map((imageField) => {
-                                                const selectedId = homepageImageIds[imageField.fieldKey] || formValues[imageField.fieldKey] || "";
-                                                const previewPath = homepageImagePreviewPaths[imageField.fieldKey] || null;
-
-                                                return (
-                                                    <div key={imageField.fieldKey} className="border border-[#C5A880]/10 rounded-3xl bg-[#070D0A]/35 overflow-hidden">
-                                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 p-6 border-b border-[#C5A880]/10">
-                                                            <div>
-                                                                <p className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
-                                                                    Homepage Media
-                                                                </p>
-                                                                <h3 className="text-xl font-serif font-light text-[#F3F4F6] mt-1">
-                                                                    {imageField.label}
-                                                                </h3>
-                                                                <p className="text-sm text-[#9CA3AF] font-light leading-relaxed mt-2 max-w-xl">
-                                                                    {imageField.description}
-                                                                </p>
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setActiveHomepageImagePicker(imageField);
-                                                                    setIsHomepageMediaPickerOpen(true);
-                                                                }}
-                                                                className="inline-flex items-center justify-center gap-2 bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] text-[10px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-xl transition-all shadow-xl shadow-[#C5A880]/5"
-                                                            >
-                                                                <ImageIcon className="w-4 h-4" />
-                                                                Change Image
-                                                            </button>
-                                                        </div>
-
-                                                        <div className="p-6">
-                                                            {selectedId && previewPath ? (
-                                                                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-center">
-                                                                    <div className="aspect-[4/3] bg-[#050806] border border-[#C5A880]/10 rounded-2xl overflow-hidden">
-                                                                        <img
-                                                                            src={previewPath}
-                                                                            alt={`Selected ${imageField.label}`}
-                                                                            className="w-full h-full object-cover"
-                                                                        />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
-                                                                            Selected Media ID
-                                                                        </p>
-                                                                        <p className="text-2xl font-serif font-light text-[#F3F4F6] mt-1">
-                                                                            {selectedId}
-                                                                        </p>
-                                                                        <p className="text-xs text-[#9CA3AF] font-light mt-3">
-                                                                            This value will be included in the existing Homepage section save payload as {imageField.fieldKey}.
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="min-h-40 flex flex-col items-center justify-center text-center border border-dashed border-[#C5A880]/15 rounded-2xl bg-[#050806]/40 p-8">
-                                                                    <ImageIcon className="w-10 h-10 text-[#C5A880]/20 mb-3" />
-                                                                    <p className="text-sm text-[#F3F4F6] font-serif tracking-wide">
-                                                                        No image selected in this editing session.
-                                                                    </p>
-                                                                    <p className="text-xs text-[#9CA3AF] font-light mt-2">
-                                                                        Current saved media ID: {selectedId || "None"}
-                                                                    </p>
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    <div className="flex items-center gap-2 bg-[#070D0A]/50 border border-[#C5A880]/10 rounded-xl px-4 py-2.5 text-[#9CA3AF]">
+                                                        <Filter className="w-4 h-4 text-[#C5A880]/70" />
+                                                        <span className="text-xs font-light">All assets</span>
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-
-                                    {/* Dynamic Fields Form */}
-                                    <div className="space-y-8">
-                                        {selectedSection.fields && selectedSection.fields.length > 0 ? (
-                                            selectedSection.fields.map((field) => {
-                                                if (selectedHomepageImageFields.some((imageField) => imageField.fieldKey === field.key)) {
-                                                    return null;
-                                                }
-
-                                                const label = formatFieldLabel(field.key);
-                                                const isRichText = field.type === "rich_text";
-                                                const isUrl = field.type === "url";
-
-                                                return (
-                                                    <div key={field.key} className="space-y-3">
-                                                        <label className="block text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
-                                                            {label}
-                                                        </label>
-
-                                                        {isRichText ? (
-                                                            <textarea
-                                                                value={formValues[field.key] || ""}
-                                                                onChange={(e) => handleInputChange(field.key, e.target.value)}
-                                                                rows={6}
-                                                                className="w-full bg-[#070D0A]/50 border border-[#C5A880]/20 hover:border-[#C5A880]/40 focus:border-[#C5A880] focus:ring-4 focus:ring-[#C5A880]/5 rounded-2xl px-6 py-4 text-base text-[#F3F4F6] placeholder-[#4B5563] focus:outline-none transition-all duration-300 leading-relaxed font-light"
-                                                            />
-                                                        ) : (
-                                                            <input
-                                                                type={isUrl ? "url" : "text"}
-                                                                value={formValues[field.key] || ""}
-                                                                onChange={(e) => handleInputChange(field.key, e.target.value)}
-                                                                className="w-full bg-[#070D0A]/50 border border-[#C5A880]/20 hover:border-[#C5A880]/40 focus:border-[#C5A880] focus:ring-4 focus:ring-[#C5A880]/5 rounded-2xl px-6 py-4 text-base text-[#F3F4F6] placeholder-[#4B5563] focus:outline-none transition-all duration-300 font-light"
-                                                            />
-                                                        )}
-                                                    </div>
-                                                );
-                                            })
-                                        ) : (
-                                            <div className="text-center py-8 text-[#9CA3AF] text-sm font-light">
-                                                No editable fields found in this section.
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
 
-                                    {/* SAVE BUTTON (Connected to save pipeline) */}
-                                    <div className="border-t border-[#C5A880]/10 pt-8 flex flex-col gap-4">
-                                        <button
-                                            type="button"
-                                            disabled={saving}
-                                            onClick={handleSave}
-                                            className={`w-full bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] font-bold text-xs tracking-[0.2em] uppercase py-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 shadow-xl shadow-[#C5A880]/5 ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
-                                        >
-                                            {saving ? (
-                                                <>
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    Saving Changes...
-                                                </>
+                                            {mediaError ? (
+                                                <div className="flex items-center gap-3 bg-red-950/10 border border-red-500/20 rounded-2xl p-5 text-red-200">
+                                                    <AlertCircle className="w-5 h-5 text-red-300 shrink-0" />
+                                                    <p className="text-sm font-light">{mediaError}</p>
+                                                </div>
+                                            ) : null}
+
+                                            {mediaLoading ? (
+                                                <div className="min-h-[280px] flex flex-col items-center justify-center text-center">
+                                                    <Loader2 className="w-10 h-10 text-[#C5A880] animate-spin mb-4" />
+                                                    <p className="text-xs font-light tracking-[0.2em] text-[#C5A880] uppercase">
+                                                        Loading Media Assets...
+                                                    </p>
+                                                </div>
+                                            ) : mediaAssets.length === 0 ? (
+                                                <div className="min-h-[260px] flex flex-col items-center justify-center text-center border border-[#C5A880]/10 rounded-3xl bg-[#070D0A]/30 p-8">
+                                                    <ImageIcon className="w-12 h-12 text-[#C5A880]/20 mb-4" />
+                                                    <h3 className="text-xl font-serif font-light text-[#F3F4F6]">No Media Assets</h3>
+                                                    <p className="text-sm text-[#9CA3AF] font-light mt-2 max-w-sm">
+                                                        Upload a JPG, PNG, or WEBP image to begin building the live media library.
+                                                    </p>
+                                                </div>
                                             ) : (
-                                                <>
-                                                    <Save className="w-4 h-4" />
-                                                    Commit Changes
-                                                </>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                                                    {mediaAssets.map((asset) => (
+                                                        <div
+                                                            key={asset.id}
+                                                            className="group bg-[#070D0A]/45 border border-[#C5A880]/10 hover:border-[#C5A880]/45 rounded-2xl overflow-hidden text-left transition-all duration-300 shadow-xl hover:-translate-y-0.5"
+                                                        >
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setSelectedMediaAsset(asset)}
+                                                                className="block w-full text-left"
+                                                            >
+                                                                <div className="aspect-[4/3] bg-[#050806] overflow-hidden relative">
+                                                                    <img
+                                                                        src={getMediaAssetUrl(asset)}
+                                                                        alt={asset.alt_text || getMediaDisplayName(asset)}
+                                                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                                                    />
+                                                                    <div className="absolute top-3 right-3 bg-[#070D0A]/80 border border-[#C5A880]/20 rounded-full px-2.5 py-1 text-[8px] tracking-widest uppercase text-[#C5A880]">
+                                                                        {asset.file_type}
+                                                                    </div>
+                                                                    <div className="absolute inset-0 bg-[#070D0A]/0 group-hover:bg-[#070D0A]/20 transition-colors flex items-center justify-center">
+                                                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-[#C5A880] text-[#070D0A] rounded-full p-2">
+                                                                            <Maximize2 className="w-4 h-4" />
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                            <div className="p-4 flex flex-col gap-3">
+                                                                <div>
+                                                                    <h3 className="text-sm font-serif tracking-wide text-[#F3F4F6] truncate">
+                                                                        {getMediaDisplayName(asset)}
+                                                                    </h3>
+                                                                    <p className="text-[10px] uppercase tracking-[0.15em] text-[#C5A880]/70 mt-1 truncate">
+                                                                        {asset.alt_text || "No alt text"}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="grid grid-cols-2 gap-2 text-[10px] text-[#9CA3AF] font-light">
+                                                                    <span>{formatMediaFileSize(asset.file_size)}</span>
+                                                                    <span className="text-right">{asset.created_at}</span>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleMediaDelete(asset)}
+                                                                    disabled={deletingMediaId === asset.id}
+                                                                    className="flex items-center justify-center gap-2 border border-red-500/20 hover:border-red-400/40 text-red-300/70 hover:text-red-200 rounded-xl py-2 text-[9px] tracking-[0.16em] uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                >
+                                                                    {deletingMediaId === asset.id ? (
+                                                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                                    ) : (
+                                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                                    )}
+                                                                    <span>{deletingMediaId === asset.id ? "Deleting" : "Delete"}</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             )}
-                                        </button>
-                                        <p className="text-[10px] font-light text-[#4B5563] tracking-widest text-center uppercase">
-                                            * Changes are deployed immediately to the live environment.
+                                        </section>
+                                    </div>
+                                ) : selectedVirtualKey === "products_showcase" ? (
+                                    <ProductEditor
+                                        products={products}
+                                        onSave={handleProductSave}
+                                        saving={saving}
+                                    />
+                                ) : selectedVirtualKey === "about_story_timeline" ? (
+                                    <StoryTimelineEditor
+                                        timeline={storyTimeline}
+                                        onSave={saveStoryTimeline}
+                                        saving={saving}
+                                        onMediaPickerOpen={(itemId, fieldKey, label) => {
+                                            setActiveAboutImagePicker({
+                                                sectionKey: "about_story_timeline",
+                                                fieldKey,
+                                                label,
+                                                itemId
+                                            });
+                                            setIsAboutMediaPickerOpen(true);
+                                        }}
+                                    />
+                                ) : selectedVirtualKey === "about_hero" ? (
+                                    <AboutHeroEditor
+                                        hero={aboutHero}
+                                        onSave={saveHero}
+                                        saving={saving}
+                                        onMediaPickerOpen={(fieldKey, label) => {
+                                            setActiveAboutImagePicker({
+                                                sectionKey: "about_hero",
+                                                fieldKey,
+                                                label
+                                            });
+                                            setIsAboutMediaPickerOpen(true);
+                                        }}
+                                    />
+                                ) : selectedVirtualKey === "about_craftsmanship" ? (
+                                    <CraftsmanshipEditor
+                                        cards={craftsmanshipCards}
+                                        onSave={saveCraftsmanshipCard}
+                                        saving={saving}
+                                        onMediaPickerOpen={(itemId, fieldKey, label) => {
+                                            setActiveAboutImagePicker({
+                                                sectionKey: "about_craftsmanship",
+                                                fieldKey,
+                                                label,
+                                                itemId
+                                            });
+                                            setIsAboutMediaPickerOpen(true);
+                                        }}
+                                    />
+                                ) : selectedVirtualKey === "about_signature_collections" ? (
+                                    <SignatureCollectionsEditor
+                                        collections={signatureCollections}
+                                        onSave={saveSignatureCollection}
+                                        saving={saving}
+                                        onMediaPickerOpen={(fieldKey, label) => {
+                                            setActiveAboutImagePicker({
+                                                sectionKey: "about_signature_collections",
+                                                fieldKey,
+                                                label
+                                            });
+                                            setIsAboutMediaPickerOpen(true);
+                                        }}
+                                    />
+                                ) : selectedVirtualKey === "heritage_stories" ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-center gap-4 bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl">
+                                        <Sparkles className="w-12 h-12 text-[#C5A880]/20" />
+                                        <h3 className="text-xl font-serif font-light text-[#F3F4F6]">Heritage Stories Module</h3>
+                                        <p className="text-sm text-[#9CA3AF] max-w-xs font-light">
+                                            This specialized module for managing luxury brand stories is scheduled for Phase 3 implementation.
                                         </p>
                                     </div>
-                                </div>
-                            ) : (
-                                /* Empty State */
-                                <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] text-[#9CA3AF]/20">
-                                    <Layers className="w-20 h-20 mb-6" />
-                                    <p className="text-lg font-serif font-light tracking-widest uppercase">Select an outline item</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </main>
+                                ) : selectedSection ? (
+                                    <div className="bg-[#0B1510]/50 border border-[#C5A880]/10 rounded-3xl p-8 lg:p-10 flex flex-col gap-10 shadow-2xl">
+                                        {selectedHomepageImageFields.length > 0 && (
+                                            <div className="flex flex-col gap-5">
+                                                {selectedHomepageImageFields.map((imageField) => {
+                                                    const selectedId = homepageImageIds[imageField.fieldKey] || formValues[imageField.fieldKey] || "";
+                                                    const previewPath = homepageImagePreviewPaths[imageField.fieldKey] || null;
+
+                                                    return (
+                                                        <div key={imageField.fieldKey} className="border border-[#C5A880]/10 rounded-3xl bg-[#070D0A]/35 overflow-hidden">
+                                                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 p-6 border-b border-[#C5A880]/10">
+                                                                <div>
+                                                                    <p className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
+                                                                        Homepage Media
+                                                                    </p>
+                                                                    <h3 className="text-xl font-serif font-light text-[#F3F4F6] mt-1">
+                                                                        {imageField.label}
+                                                                    </h3>
+                                                                    <p className="text-sm text-[#9CA3AF] font-light leading-relaxed mt-2 max-w-xl">
+                                                                        {imageField.description}
+                                                                    </p>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setActiveHomepageImagePicker(imageField);
+                                                                        setIsHomepageMediaPickerOpen(true);
+                                                                    }}
+                                                                    className="inline-flex items-center justify-center gap-2 bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] text-[10px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-xl transition-all shadow-xl shadow-[#C5A880]/5"
+                                                                >
+                                                                    <ImageIcon className="w-4 h-4" />
+                                                                    Change Image
+                                                                </button>
+                                                            </div>
+
+                                                            <div className="p-6">
+                                                                {selectedId && previewPath ? (
+                                                                    <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-center">
+                                                                        <div className="aspect-[4/3] bg-[#050806] border border-[#C5A880]/10 rounded-2xl overflow-hidden">
+                                                                            <img
+                                                                                src={previewPath}
+                                                                                alt={`Selected ${imageField.label}`}
+                                                                                className="w-full h-full object-cover"
+                                                                            />
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
+                                                                                Selected Media ID
+                                                                            </p>
+                                                                            <p className="text-2xl font-serif font-light text-[#F3F4F6] mt-1">
+                                                                                {selectedId}
+                                                                            </p>
+                                                                            <p className="text-xs text-[#9CA3AF] font-light mt-3">
+                                                                                This value will be included in the existing Homepage section save payload as {imageField.fieldKey}.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="min-h-40 flex flex-col items-center justify-center text-center border border-dashed border-[#C5A880]/15 rounded-2xl bg-[#050806]/40 p-8">
+                                                                        <ImageIcon className="w-10 h-10 text-[#C5A880]/20 mb-3" />
+                                                                        <p className="text-sm text-[#F3F4F6] font-serif tracking-wide">
+                                                                            No image selected in this editing session.
+                                                                        </p>
+                                                                        <p className="text-xs text-[#9CA3AF] font-light mt-2">
+                                                                            Current saved media ID: {selectedId || "None"}
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* Dynamic Fields Form */}
+                                        <div className="space-y-8">
+                                            {selectedSection.fields && selectedSection.fields.length > 0 ? (
+                                                selectedSection.fields.map((field) => {
+                                                    if (selectedHomepageImageFields.some((imageField) => imageField.fieldKey === field.key)) {
+                                                        return null;
+                                                    }
+
+                                                    const label = formatFieldLabel(field.key);
+                                                    const isRichText = field.type === "rich_text";
+                                                    const isUrl = field.type === "url";
+
+                                                    return (
+                                                        <div key={field.key} className="space-y-3">
+                                                            <label className="block text-[10px] font-bold text-[#C5A880] tracking-[0.2em] uppercase">
+                                                                {label}
+                                                            </label>
+
+                                                            {isRichText ? (
+                                                                <textarea
+                                                                    value={formValues[field.key] || ""}
+                                                                    onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                                    rows={6}
+                                                                    className="w-full bg-[#070D0A]/50 border border-[#C5A880]/20 hover:border-[#C5A880]/40 focus:border-[#C5A880] focus:ring-4 focus:ring-[#C5A880]/5 rounded-2xl px-6 py-4 text-base text-[#F3F4F6] placeholder-[#4B5563] focus:outline-none transition-all duration-300 leading-relaxed font-light"
+                                                                />
+                                                            ) : (
+                                                                <input
+                                                                    type={isUrl ? "url" : "text"}
+                                                                    value={formValues[field.key] || ""}
+                                                                    onChange={(e) => handleInputChange(field.key, e.target.value)}
+                                                                    className="w-full bg-[#070D0A]/50 border border-[#C5A880]/20 hover:border-[#C5A880]/40 focus:border-[#C5A880] focus:ring-4 focus:ring-[#C5A880]/5 rounded-2xl px-6 py-4 text-base text-[#F3F4F6] placeholder-[#4B5563] focus:outline-none transition-all duration-300 font-light"
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })
+                                            ) : (
+                                                <div className="text-center py-8 text-[#9CA3AF] text-sm font-light">
+                                                    No editable fields found in this section.
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* SAVE BUTTON (Connected to save pipeline) */}
+                                        <div className="border-t border-[#C5A880]/10 pt-8 flex flex-col gap-4">
+                                            <button
+                                                type="button"
+                                                disabled={saving}
+                                                onClick={handleSave}
+                                                className={`w-full bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] font-bold text-xs tracking-[0.2em] uppercase py-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 shadow-xl shadow-[#C5A880]/5 ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            >
+                                                {saving ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        Saving Changes...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4" />
+                                                        Commit Changes
+                                                    </>
+                                                )}
+                                            </button>
+                                            <p className="text-[10px] font-light text-[#4B5563] tracking-widest text-center uppercase">
+                                                * Changes are deployed immediately to the live environment.
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    /* Empty State */
+                                    <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] text-[#9CA3AF]/20">
+                                        <Layers className="w-20 h-20 mb-6" />
+                                        <p className="text-lg font-serif font-light tracking-widest uppercase">Select an outline item</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </main>
+                )}
             </div>
 
             <MediaPickerModal

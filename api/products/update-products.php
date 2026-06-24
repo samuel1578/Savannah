@@ -30,6 +30,7 @@ try {
         SET
             title = ?,
             description = ?,
+            image_id = ?,
             updated_at = NOW()
         WHERE id = ?
     ");
@@ -37,6 +38,7 @@ try {
     $stmt->execute([
         $input['title'] ?? '',
         $input['description'] ?? '',
+        $input['image_id'] ?? null,
         $productId
     ]);
 

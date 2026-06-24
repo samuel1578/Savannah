@@ -4,32 +4,17 @@ import { Link } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { MenuOverlay } from "../../components/MenuOverlay";
 import { FooterBrandInviteSection } from "../Homepage/sections/FooterBrandInviteSection";
+import { useBlogCms } from "../../hooks/useBlogCms";
+import { getFullImageUrl } from "../../utils/urlHelpers";
 import heritageImage from "../../assets/heritagee.png";
 import memoryImage from "../../assets/memory.jpg";
 
-const posts = [
-  {
-    title: ["FROM PALM FRUIT", "TO LUXURY", "HYDRATION"],
-    category: "Heritage Process",
-    excerpt:
-      "Discover how a deeply rooted Ghanaian palm fruit tradition inspired the creation of Savannah Water - transforming memory, culture, and craftsmanship into a refined modern hydration experience.",
-    image: heritageImage,
-    imageAlt: "Palm fruit heritage process for Savannah Water",
-    href: "#palm-fruit-to-luxury-hydration",
-  },
-  {
-    title: ["THE MEMORY", "BEHIND", "SAVANNAH", "WATER"],
-    category: "Founder Story",
-    excerpt:
-      "From childhood journeys for water in Madina to building a globally inspired premium brand, discover the emotional story that shaped Savannah Water.",
-    image: memoryImage,
-    imageAlt: "Savannah Water founder story inspiration",
-    href: "#the-memory-behind-savannah-water",
-  },
-];
-
 export const BlogPage = (): JSX.Element => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { posts, loading, error } = useBlogCms();
+
+  // Filter only published posts for the public page
+  const publishedPosts = posts.filter(post => post.status === "published");
 
   return (
     <main className="min-h-screen bg-white text-[#242514]">
@@ -46,47 +31,66 @@ export const BlogPage = (): JSX.Element => {
       </section>
 
       <section className="px-6 py-16 sm:px-10 lg:px-16 lg:py-24">
-        <div className="mx-auto grid max-w-[1320px] gap-16 lg:grid-cols-2 lg:gap-20">
-          {posts.map((post, index) => (
-            <article
-              key={post.href}
-              className={index === 1 ? "lg:pt-0" : ""}
-            >
-              <a href={post.href} className="group block">
-                <div className="relative mb-9 aspect-[1.85/1] overflow-hidden bg-[#e5e3df]">
-                  <img
-                    src={post.image}
-                    alt={post.imageAlt}
-                    className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.04]"
-                  />
-                </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#242514] border-t-transparent"></div>
+          </div>
+        ) : error ? (
+          <div className="mx-auto max-w-[1320px] text-center py-20">
+            <p className="text-lg text-[#242514]/60">{error}</p>
+          </div>
+        ) : publishedPosts.length === 0 ? (
+          <div className="mx-auto max-w-[1320px] text-center py-20">
+            <p className="text-lg text-[#242514]/60">No stories published yet. Check back soon.</p>
+          </div>
+        ) : (
+          <div className="mx-auto grid max-w-[1320px] gap-16 lg:grid-cols-2 lg:gap-20">
+            {publishedPosts.map((post, index) => {
+              const displayImage = post.featured_image_url ? getFullImageUrl(post.featured_image_url) : (post.file_path ? getFullImageUrl(post.file_path) : (index === 0 ? heritageImage : memoryImage));
+              const titleLines = post.title.split(" ");
 
-                <div className="max-w-[430px]">
-                  <p className="mb-5 [font-family:'Raleway',Helvetica] text-sm font-medium leading-[16px] text-[#111]">
-                    {post.category}
-                  </p>
+              return (
+                <article
+                  key={post.id}
+                  className={index % 2 === 1 ? "lg:pt-0" : ""}
+                >
+                  <Link to={`/blog/${post.slug}`} className="group block">
+                    <div className="relative mb-9 aspect-[1.85/1] overflow-hidden bg-[#e5e3df]">
+                      <img
+                        src={displayImage}
+                        alt={post.featured_image_alt || post.alt_text || post.title}
+                        className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.04]"
+                      />
+                    </div>
 
-                  <h1 className="[font-family:'Cormorant_Unicase',Helvetica] text-[46px] font-light lowercase leading-[0.86] tracking-[-3px] text-[#242514] sm:text-[56px] lg:text-[64px]">
-                    {post.title.map((line) => (
-                      <span key={line} className="block">
-                        {line}
+                    <div className="max-w-[430px]">
+                      <p className="mb-5 [font-family:'Raleway',Helvetica] text-sm font-medium leading-[16px] text-[#111]">
+                        {post.category_name || "Heritage"}
+                      </p>
+
+                      <h1 className="[font-family:'Cormorant_Unicase',Helvetica] text-[46px] font-light lowercase leading-[0.86] tracking-[-3px] text-[#242514] sm:text-[56px] lg:text-[64px]">
+                        {titleLines.map((line, idx) => (
+                          <span key={`${post.id}-line-${idx}`} className="block">
+                            {line}
+                          </span>
+                        ))}
+                      </h1>
+
+                      <p className="mt-7 [font-family:'Raleway',Helvetica] text-sm leading-[25px] text-[#242514]/80 sm:text-base">
+                        {post.excerpt}
+                      </p>
+
+                      <span className="luxury-link mt-6 inline-flex [font-family:'Bellefair',Helvetica] text-[23px] leading-[46px] text-[#242514]">
+                        Read More
+                        <span className="text-[#a8a7a7] arrow-line">--</span>
                       </span>
-                    ))}
-                  </h1>
-
-                  <p className="mt-7 [font-family:'Raleway',Helvetica] text-sm leading-[25px] text-[#242514]/80 sm:text-base">
-                    {post.excerpt}
-                  </p>
-
-                  <span className="luxury-link mt-6 inline-flex [font-family:'Bellefair',Helvetica] text-[23px] leading-[46px] text-[#242514]">
-                    Read More
-                    <span className="text-[#a8a7a7] arrow-line">--</span>
-                  </span>
-                </div>
-              </a>
-            </article>
-          ))}
-        </div>
+                    </div>
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <FooterBrandInviteSection />

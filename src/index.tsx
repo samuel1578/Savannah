@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AboutPage } from "./screens/AboutPage";
-import { BlogPage } from "./screens/BlogPage";
+import { BlogPage, BlogPostPage } from "./screens/BlogPage";
 import { ContactPage } from "./screens/ContactPage";
 import { Homepage } from "./screens/Homepage";
 import { Login } from "./screens/Admin/Login";
@@ -20,6 +20,7 @@ createRoot(document.getElementById("app") as HTMLElement).render(
           <Route path="/" element={<Homepage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/admin/login" element={<Login />} />
           <Route path="/admin/dashboard" element={

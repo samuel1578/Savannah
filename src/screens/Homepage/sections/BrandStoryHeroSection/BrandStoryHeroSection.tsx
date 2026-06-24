@@ -47,10 +47,11 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
   // Map products to local structure while keeping images hardcoded
   const displayProducts = products.map(p => {
     const isReserve = p.product_key.includes("reserve");
+    const cmsImage = p.file_path ? getFullImageUrl(p.file_path) : (isReserve ? reserveImage : dailyImage);
     return {
       title: p.title,
       description: p.description,
-      image: isReserve ? reserveImage : dailyImage,
+      image: cmsImage,
       imageClassName: isReserve
         ? "h-[260px] w-auto rotate-[-14deg] object-contain sm:h-[320px] lg:h-[420px]"
         : "h-[240px] w-auto rotate-[12deg] object-contain sm:h-[300px] lg:h-[380px]",

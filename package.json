@@ -10,6 +10,11 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",
+    "@tiptap/extension-link": "^3.27.1",
+    "@tiptap/extension-underline": "^3.27.1",
+    "@tiptap/pm": "^3.27.1",
+    "@tiptap/react": "^3.27.1",
+    "@tiptap/starter-kit": "^3.27.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "2.1.1",
     "gsap": "^3.15.0",
