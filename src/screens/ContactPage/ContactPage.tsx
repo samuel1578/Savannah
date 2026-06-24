@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { MapPin } from "lucide-react";
+import { MapPin, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 import { Header } from "../../components/Header";
 import { MenuOverlay } from "../../components/MenuOverlay";
@@ -11,6 +11,8 @@ import { Input } from "../../components/ui/input";
 import luxuryExperience from "../../assets/luxury.png";
 import originMap from "../../assets/map.png";
 import { FooterBrandInviteSection } from "../Homepage/sections/FooterBrandInviteSection";
+import { contactCmsService } from "../../services/contactCmsService";
+import { useContactCms } from "../../hooks/useContactCms";
 
 const experienceTypes = [
   "Private tasting",
@@ -21,6 +23,11 @@ const experienceTypes = [
 
 export const ContactPage = (): JSX.Element => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { settings } = useContactCms();
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -159,8 +166,52 @@ export const ContactPage = (): JSX.Element => {
     };
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setErrorMessage(null);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    // Explicitly gather and validate data
+    const data = {
+      name: (formData.get('name') || '').toString().trim(),
+      email: (formData.get('email') || '').toString().trim(),
+      experience_type: (formData.get('experience') || '').toString(),
+      preferred_date: (formData.get('date') || '').toString(),
+      message: (formData.get('message') || '').toString().trim(),
+    };
+
+    console.log("Submitting contact form:", data);
+
+    if (!data.name || !data.email || !data.message) {
+      setSubmitStatus("error");
+      setErrorMessage("Please fill in all required fields (Name, Email, and Message).");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await contactCmsService.submitForm(data);
+      console.log("Form submission response:", response);
+
+      if (response.success) {
+        setSubmitStatus("success");
+        form.reset();
+        setTimeout(() => setSubmitStatus("idle"), 5000);
+      } else {
+        setSubmitStatus("error");
+        setErrorMessage(response.message || "Something went wrong. Please try again.");
+      }
+    } catch (error: any) {
+      console.error("Form submission error:", error);
+      setSubmitStatus("error");
+      setErrorMessage(error?.message || "The server is currently unavailable. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -202,8 +253,8 @@ export const ContactPage = (): JSX.Element => {
           <div className="relative h-[420px] overflow-hidden sm:h-[560px] lg:h-[720px] hospitality-wrap">
             <div className="absolute inset-0 hospitality-clip" style={{ clipPath: "inset(0 100% 0 0)" }}>
               <img
-                src={luxuryExperience}
-                alt="Guests enjoying Savannah Water during a private tasting"
+                src={settings?.hero_image_url ? `https://savannahdrinks.co.uk${settings.hero_image_url}` : luxuryExperience}
+                alt={settings?.hero_image_alt || "Guests enjoying Savannah Water during a private tasting"}
                 className="h-full w-full object-cover hospitality-image"
               />
             </div>
@@ -277,10 +328,31 @@ export const ContactPage = (): JSX.Element => {
               <Button
                 type="submit"
                 variant="ghost"
-                className="submit-ghost h-auto rounded-none px-0 [font-family:'Bellefair',Helvetica] text-[23px] font-normal tracking-[1px] text-[#242514] hover:bg-transparent hover:text-[#242514]/70"
+                disabled={isSubmitting}
+                className="submit-ghost h-auto rounded-none px-0 [font-family:'Bellefair',Helvetica] text-[23px] font-normal tracking-[1px] text-[#242514] hover:bg-transparent hover:text-[#242514]/70 disabled:opacity-50"
               >
-                Submit
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Submitting...
+                  </span>
+                ) : "Submit"}
               </Button>
+
+              {submitStatus === "success" && (
+                <div className="mt-4 flex items-center gap-2 text-emerald-600 animate-in fade-in slide-in-from-top-2">
+                  <CheckCircle2 className="w-5 h-5" />
+                  <span className="text-sm font-medium">Thank you. Your message has been received.</span>
+                </div>
+              )}
+
+              {submitStatus === "error" && (
+                <div className="mt-4 flex items-center gap-2 text-red-500 animate-in fade-in slide-in-from-top-2">
+                  <AlertCircle className="w-5 h-5" />
+                  <span className="text-sm font-medium">{errorMessage}</span>
+                </div>
+              )}
+
               <p className="mt-3 [font-family:'Bellefair',Helvetica] text-[21px] leading-[1.45] tracking-[1px] text-[#242514]">
                 Curated experiences for hospitality partners, luxury venues, and private tastings.
               </p>

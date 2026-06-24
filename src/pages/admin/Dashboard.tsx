@@ -11,6 +11,7 @@ import { CraftsmanshipEditor } from "./CraftsmanshipEditor";
 import { SignatureCollectionsEditor } from "./SignatureCollectionsEditor";
 import { AboutHeroEditor } from "./AboutHeroEditor";
 import { BlogModule } from "./modules/BlogModule";
+import { ContactModule } from "./modules/ContactModule";
 import { MediaPickerModal, MediaPickerSelection } from "./MediaPickerModal";
 import logoLight from "../../assets/logo-light.png";
 import styles from "./Dashboard.module.css";
@@ -219,7 +220,7 @@ const PAGE_TYPES: Record<CmsPageKey, CmsPageType> = {
     home: "content",
     about: "content",
     blog: "tool",
-    contact: "content",
+    contact: "tool",
     "media-library": "tool",
     "global-settings": "tool"
 };
@@ -874,9 +875,16 @@ export const Dashboard: React.FC = () => {
                                 {!isNavCollapsed && <span>Our Blog</span>}
                             </button>
 
+                            <button
+                                onClick={() => setActivePage("contact")}
+                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "contact" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
+                            >
+                                <Mail className="w-4 h-4" />
+                                {!isNavCollapsed && <span>Contact Us</span>}
+                            </button>
+
                             {/* Disabled placeholders */}
                             {[
-                                { label: "Contact Us", icon: Mail },
                                 { label: "Global Settings", icon: Settings }
                             ].map((item, index) => (
                                 <div
@@ -970,6 +978,8 @@ export const Dashboard: React.FC = () => {
 
                 {activePage === "blog" ? (
                     <BlogModule />
+                ) : activePage === "contact" ? (
+                    <ContactModule />
                 ) : (
                     /* MAIN CONTENT AREA: EDITOR (Priority 60-70% width) */
                     <main
