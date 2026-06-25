@@ -1,55 +1,47 @@
 import React, { useState } from "react";
 import { ContactSubmission } from "../../../services/contactCmsService";
-import { X, Send, Loader2, CheckCircle2, AlertCircle, Mail, MessageSquare } from "lucide-react";
+import { X, Send, CheckCircle2, Mail, MessageSquare } from "lucide-react";
 
 interface FollowUpModalProps {
     isOpen: boolean;
     onClose: () => void;
     submission: ContactSubmission;
-    onSend: (id: number, subject: string, message: string) => Promise<any>;
 }
 
 export const FollowUpModal: React.FC<FollowUpModalProps> = ({
     isOpen,
     onClose,
-    submission,
-    onSend
+    submission
 }) => {
     const [subject, setSubject] = useState(`Re: Savannah Water Inquiry - ${submission.experience_type || "General"}`);
     const [message, setMessage] = useState("");
-    const [isSending, setIsSending] = useState(false);
-    const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [status, setStatus] = useState<"idle" | "success">("idle");
 
-    const handleSend = async () => {
+    const handleSend = () => {
         if (!message.trim()) return;
 
-        setIsSending(true);
-        setStatus("idle");
         try {
             // 1. Construct the email body for mailto
             const emailBody = `Dear ${submission.name},\n\n${message}\n\n---\nOriginal Message:\n${submission.message}\n\nWarm regards,\nSavannah Water Team\nhttps://savannahdrinks.co.uk`;
 
             // 2. Construct and open the mailto link
             const mailtoLink = `mailto:${submission.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-            window.open(mailtoLink, '_blank');
 
-            // 3. Call backend to log the follow-up and update status to 'replied'
-            await onSend(submission.id, subject, message);
+            // Open in default mail client
+            window.location.href = mailtoLink;
 
             setStatus("success");
+
+            // Close modal after a brief delay to show success state
             setTimeout(() => {
                 onClose();
                 setStatus("idle");
                 setMessage("");
-            }, 2000);
+            }, 1500);
         } catch (err: any) {
-            console.error("Error in follow-up flow:", err);
-            // Even if the backend log fails, the mailto was opened, but we show the error for logging
-            setStatus("error");
-            setErrorMessage(err.message || "Failed to log follow-up on server");
-        } finally {
-            setIsSending(false);
+            console.error("Error opening mail client:", err);
+            // Fallback: just close
+            onClose();
         }
     };
 
@@ -126,13 +118,7 @@ export const FollowUpModal: React.FC<FollowUpModalProps> = ({
                         {status === "success" && (
                             <div className="flex items-center gap-2 text-emerald-400 animate-in slide-in-from-left-2">
                                 <CheckCircle2 className="w-4 h-4" />
-                                <span className="text-xs font-bold uppercase tracking-widest">Email Sent Successfully</span>
-                            </div>
-                        )}
-                        {status === "error" && (
-                            <div className="flex items-center gap-2 text-red-400 animate-in slide-in-from-left-2">
-                                <AlertCircle className="w-4 h-4" />
-                                <span className="text-xs font-bold uppercase tracking-widest">{errorMessage}</span>
+                                <span className="text-xs font-bold uppercase tracking-widest">Opening Email Client...</span>
                             </div>
                         )}
                     </div>
@@ -146,20 +132,18 @@ export const FollowUpModal: React.FC<FollowUpModalProps> = ({
                         </button>
                         <button
                             onClick={handleSend}
-                            disabled={isSending || !message.trim() || status === "success"}
+                            disabled={!message.trim() || status === "success"}
                             className={`flex items-center gap-3 px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300 ${status === "success"
                                 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                                 : "bg-[#C5A880] hover:bg-[#D5B890] text-[#070D0A] shadow-lg shadow-[#C5A880]/10"
                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
-                            {isSending ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : status === "success" ? (
+                            {status === "success" ? (
                                 <CheckCircle2 className="w-4 h-4" />
                             ) : (
                                 <Send className="w-4 h-4" />
                             )}
-                            <span>{isSending ? "Sending..." : status === "success" ? "Sent" : "Send Email"}</span>
+                            <span>{status === "success" ? "Opening..." : "Open Email App"}</span>
                         </button>
                     </div>
                 </div>

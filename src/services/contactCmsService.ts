@@ -213,27 +213,6 @@ class ContactCmsService {
             throw new Error("SERVER_UNAVAILABLE");
         }
     }
-
-    /**
-     * Send follow-up email
-     */
-    async sendFollowUp(id: number, subject: string, message: string): Promise<UpdateResponse> {
-        try {
-            const response = await authService.secureFetch(`${this.apiBase}/send-follow-up.php`, {
-                method: "POST",
-                body: JSON.stringify({ id, subject, message }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error sending follow-up email:", error);
-            throw new Error("SERVER_UNAVAILABLE");
-        }
-    }
 }
 
 export const contactCmsService = new ContactCmsService();

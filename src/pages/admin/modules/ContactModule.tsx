@@ -153,7 +153,6 @@ export const ContactModule: React.FC = () => {
                                 onBack={handleBackToList}
                                 onUpdateStatus={updateStatus}
                                 onUpdateNotes={updateNotes}
-                                onSendFollowUp={sendFollowUp}
                             />
                         ) : (
                             <>

@@ -100,16 +100,6 @@ export const useContactCms = () => {
         }
     };
 
-    const sendFollowUp = async (id: number, subject: string, message: string) => {
-        try {
-            const response = await contactCmsService.sendFollowUp(id, subject, message);
-            return response;
-        } catch (err) {
-            console.error("Error sending follow-up:", err);
-            throw err;
-        }
-    };
-
     useEffect(() => {
         fetchSettings();
     }, [fetchSettings]);
@@ -143,7 +133,6 @@ export const useContactCms = () => {
         updateSettings,
         updateStatus,
         updateNotes,
-        sendFollowUp,
         setSelectedSubmission
     };
 };

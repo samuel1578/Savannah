@@ -9,7 +9,6 @@ interface SubmissionDetailProps {
     onBack: () => void;
     onUpdateStatus: (id: number, status: string) => Promise<any>;
     onUpdateNotes: (id: number, notes: string) => Promise<any>;
-    onSendFollowUp: (id: number, subject: string, message: string) => Promise<any>;
 }
 
 export const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
@@ -17,8 +16,7 @@ export const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
     loading,
     onBack,
     onUpdateStatus,
-    onUpdateNotes,
-    onSendFollowUp
+    onUpdateNotes
 }) => {
     const [notes, setNotes] = useState(submission.admin_notes || "");
     const [isSavingNotes, setIsSavingNotes] = useState(false);
@@ -79,9 +77,9 @@ export const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
                         value={submission.status}
                         onChange={(e) => handleStatusChange(e.target.value)}
                         className={`bg-[#0B1510] border border-[#C5A880]/20 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl outline-none focus:border-[#C5A880] transition-all ${submission.status === 'new' ? 'text-amber-400' :
-                                submission.status === 'read' ? 'text-blue-400' :
-                                    submission.status === 'replied' ? 'text-emerald-400' :
-                                        'text-gray-400'
+                            submission.status === 'read' ? 'text-blue-400' :
+                                submission.status === 'replied' ? 'text-emerald-400' :
+                                    'text-gray-400'
                             }`}
                     >
                         <option value="new">New</option>
@@ -165,10 +163,10 @@ export const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
                                 onClick={handleSaveNotes}
                                 disabled={isSavingNotes || notes === submission.admin_notes}
                                 className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${saveStatus === "success"
-                                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                        : saveStatus === "error"
-                                            ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                                            : "bg-[#C5A880]/10 hover:bg-[#C5A880]/20 text-[#C5A880] border border-[#C5A880]/20"
+                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                    : saveStatus === "error"
+                                        ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                                        : "bg-[#C5A880]/10 hover:bg-[#C5A880]/20 text-[#C5A880] border border-[#C5A880]/20"
                                     } disabled:opacity-30 disabled:cursor-not-allowed`}
                             >
                                 {isSavingNotes ? (
@@ -189,7 +187,6 @@ export const SubmissionDetail: React.FC<SubmissionDetailProps> = ({
                 isOpen={showReplyModal}
                 onClose={() => setShowReplyModal(false)}
                 submission={submission}
-                onSend={onSendFollowUp}
             />
         </div>
     );
