@@ -10,6 +10,7 @@ import { FooterBrandInviteSection } from "../Homepage/sections/FooterBrandInvite
 import { SignatureCollectionsSection } from "./SignatureCollectionsSection";
 import { useAboutPageCms } from "../../hooks/useAboutPageCms";
 import { useHomepageCms } from "../../hooks/useHomepageCms";
+import { useGlobalSettings } from "../../hooks/useGlobalSettings";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
@@ -235,6 +236,7 @@ export const AboutPage = (): JSX.Element => {
     } = useAboutPageCms();
 
     const { homepageSections, loading: homeLoading, error: homeError } = useHomepageCms();
+    const { settings: globalSettings } = useGlobalSettings();
 
     const loading = aboutLoading || homeLoading;
     const error = aboutError || homeError;
@@ -745,7 +747,7 @@ export const AboutPage = (): JSX.Element => {
             </section>
 
             <section className="w-full">
-                <FooterBrandInviteSection data={getHomeData("footer_invite")} />
+                <FooterBrandInviteSection data={getHomeData("footer_invite")} globalSettings={globalSettings} />
             </section>
 
             <MenuOverlay

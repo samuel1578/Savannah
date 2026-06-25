@@ -13,23 +13,14 @@
     font-family: 'Inter', sans-serif !important;
 }
 
-/* Premium Custom Scrollbars for Luxury CMS Dashboard */
+/* Premium Custom Scrollbars for Luxury CMS Dashboard - Hidden but functional */
+.customScrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
 .customScrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-.customScrollbar::-webkit-scrollbar-track {
-    background: rgba(11, 21, 16, 0.3);
-}
-
-.customScrollbar::-webkit-scrollbar-thumb {
-    background: rgba(197, 168, 128, 0.2);
-    border-radius: 3px;
-}
-
-.customScrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(197, 168, 128, 0.4);
+    display: none; /* Chrome, Safari and Opera */
 }
 
 /* Glassmorphism Panel Backdrop */

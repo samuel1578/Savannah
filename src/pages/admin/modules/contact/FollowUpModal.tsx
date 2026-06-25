@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ContactSubmission } from "../../../services/contactCmsService";
+import { ContactSubmission } from "../../../../services/contactCmsService";
 import { X, Send, CheckCircle2, Mail, MessageSquare } from "lucide-react";
 
 interface FollowUpModalProps {

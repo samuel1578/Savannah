@@ -3,6 +3,7 @@ import { Input } from "../../../../components/ui/input";
 import { Link } from "react-router-dom";
 import logoLight from "../../../../assets/logo-light.png";
 import { HomepageSection } from "../../../../services/homepageCmsService";
+import { GlobalSetting } from "../../../../services/globalSettingsService";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -13,19 +14,25 @@ const navLinks = [
 
 interface FooterBrandInviteSectionProps {
   data?: HomepageSection;
+  globalSettings?: GlobalSetting[] | null;
 }
 
-export const FooterBrandInviteSection = ({ data }: FooterBrandInviteSectionProps): JSX.Element => {
+export const FooterBrandInviteSection = ({ data, globalSettings }: FooterBrandInviteSectionProps): JSX.Element => {
   const getField = (key: string, fallback: string) => {
     return data?.fields.find(f => f.key === key)?.value || fallback;
   };
 
+  const getGlobalSetting = (key: string) => globalSettings?.find(s => s.setting_key === key)?.setting_value;
+
   const newsletterPlaceholder = getField("newsletter_placeholder", "Your E-mail");
   const newsletterButtonText = getField("newsletter_button_text", "Send");
 
+  const companyName = getGlobalSetting('company_name') || 'Savannah Drinks';
+  const copyrightText = getGlobalSetting('copyright_text') || `© 2026 ${companyName}, All Rights Reserved`;
+
   // Resolve Footer Logo from CMS
   const cmsFooterLogoUrl = getField("footer_logo_image_url", "");
-  const cmsFooterLogoAlt = getField("footer_logo_image_alt", "Savannah Water Logo");
+  const cmsFooterLogoAlt = getField("footer_logo_image_alt", `${companyName} Logo`);
 
   const getFullImageUrl = (path: string) => {
     if (!path) return "";
@@ -89,7 +96,7 @@ export const FooterBrandInviteSection = ({ data }: FooterBrandInviteSectionProps
         {/* Copyright */}
         <div className="w-full border-t border-white/5 pt-8 footer-copyright">
           <p className="[font-family:'Raleway',Helvetica] text-xs sm:text-sm text-[#a8a7a7]/60 leading-[25px]">
-            © 2026 Savannah Drinks, All Rights Reserved
+            {copyrightText}
           </p>
         </div>
 

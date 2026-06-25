@@ -12,6 +12,7 @@ import { SignatureCollectionsEditor } from "./SignatureCollectionsEditor";
 import { AboutHeroEditor } from "./AboutHeroEditor";
 import { BlogModule } from "./modules/BlogModule";
 import { ContactModule } from "./modules/ContactModule";
+import { GlobalSettingsModule } from "./modules/GlobalSettingsModule";
 import { MediaPickerModal, MediaPickerSelection } from "./MediaPickerModal";
 import logoLight from "../../assets/logo-light.png";
 import styles from "./Dashboard.module.css";
@@ -800,7 +801,7 @@ export const Dashboard: React.FC = () => {
         : [];
 
     return (
-        <div className={`min-h-screen bg-[#070D0A] text-[#F3F4F6] font-sans flex flex-col overflow-hidden ${styles.cmsContainer}`}>
+        <div className={`h-screen bg-[#070D0A] text-[#F3F4F6] font-sans flex flex-col overflow-hidden ${styles.cmsContainer}`}>
 
             {/* MOBILE HEADER BAR */}
             <div className="md:hidden flex items-center justify-between px-6 py-4 bg-[#0B1510] border-b border-[#C5A880]/15 z-50">
@@ -820,10 +821,10 @@ export const Dashboard: React.FC = () => {
                 {/* SIDEBAR 1: CMS PAGE NAVIGATION (Collapsible to icons) */}
                 <aside
                     ref={sidebarRef}
-                    className={`fixed inset-y-0 left-0 z-40 bg-[#0B1510] border-r border-[#C5A880]/15 flex flex-col justify-between py-8 transition-all duration-300 md:translate-x-0 md:static ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    className={`fixed inset-y-0 left-0 z-40 bg-[#0B1510] border-r border-[#C5A880]/15 flex flex-col justify-between py-8 transition-all duration-300 md:translate-x-0 md:relative md:h-full overflow-visible ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                         } ${isNavCollapsed ? styles.navSidebarCollapsed : styles.navSidebar}`}
                 >
-                    <div className="flex flex-col gap-10 px-4">
+                    <div className="flex flex-col gap-10 px-4 flex-grow overflow-y-auto overflow-x-hidden customScrollbar">
                         {/* Logo Branding */}
                         <div className="flex flex-col gap-2 relative">
                             <div className={`flex items-center gap-3 transition-all duration-300 ${isNavCollapsed ? "justify-center" : ""}`}>
@@ -860,14 +861,6 @@ export const Dashboard: React.FC = () => {
                             </button>
 
                             <button
-                                onClick={() => setActivePage("media-library")}
-                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "media-library" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
-                            >
-                                <ImageIcon className="w-4 h-4" />
-                                {!isNavCollapsed && <span>Media Library</span>}
-                            </button>
-
-                            <button
                                 onClick={() => setActivePage("blog")}
                                 className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "blog" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
                             >
@@ -883,24 +876,26 @@ export const Dashboard: React.FC = () => {
                                 {!isNavCollapsed && <span>Contact Us</span>}
                             </button>
 
-                            {/* Disabled placeholders */}
-                            {[
-                                { label: "Global Settings", icon: Settings }
-                            ].map((item, index) => (
-                                <div
-                                    key={index}
-                                    className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-[#F3F4F6]/25 text-sm tracking-wider uppercase font-light cursor-not-allowed select-none group transition-all ${isNavCollapsed ? "justify-center px-0" : ""}`}
-                                    title={isNavCollapsed ? item.label : "Available in Phase 2 Expansion"}
-                                >
-                                    <item.icon className="w-4 h-4 text-[#F3F4F6]/20" />
-                                    {!isNavCollapsed && <span>{item.label}</span>}
-                                </div>
-                            ))}
+                            <button
+                                onClick={() => setActivePage("media-library")}
+                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "media-library" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
+                            >
+                                <ImageIcon className="w-4 h-4" />
+                                {!isNavCollapsed && <span>Media Library</span>}
+                            </button>
+
+                            <button
+                                onClick={() => setActivePage("global-settings")}
+                                className={`flex items-center gap-3 w-full text-left py-3 px-4 rounded-xl text-sm tracking-wider uppercase font-medium transition-all duration-300 ${isNavCollapsed ? "justify-center px-0" : ""} ${activePage === "global-settings" ? "bg-[#C5A880]/10 border border-[#C5A880]/25 text-[#C5A880]" : "text-[#F3F4F6]/60 hover:text-[#F3F4F6] hover:bg-white/5"}`}
+                            >
+                                <Settings className="w-4 h-4" />
+                                {!isNavCollapsed && <span>Global Settings</span>}
+                            </button>
                         </nav>
                     </div>
 
                     {/* User profile & Logout */}
-                    <div className={`border-t border-[#C5A880]/10 pt-6 flex flex-col gap-4 transition-all px-4 ${isNavCollapsed ? "items-center" : ""}`}>
+                    <div className={`border-t border-[#C5A880]/10 pt-6 flex flex-col gap-4 transition-all px-4 mt-auto ${isNavCollapsed ? "items-center" : ""}`}>
                         <div className={`flex items-center gap-3 ${isNavCollapsed ? "justify-center" : ""}`}>
                             <div className="w-8 h-8 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 flex items-center justify-center text-[#C5A880] shrink-0">
                                 <User className="w-4 h-4" />
@@ -926,7 +921,7 @@ export const Dashboard: React.FC = () => {
 
                 {showStructureSidebar && (
                     /* SIDEBAR 2: PAGE STRUCTURE NAVIGATION (Document Outline Style) */
-                    <div className={`bg-[#070D0A] border-r border-[#C5A880]/10 flex flex-col p-6 transition-all duration-500 overflow-y-auto customScrollbar ${isStructureCollapsed ? styles.structurePanelCollapsed : styles.structurePanel}`}>
+                    <div className={`bg-[#070D0A] border-r border-[#C5A880]/10 flex flex-col p-6 transition-all duration-500 overflow-y-auto overflow-x-hidden customScrollbar ${isStructureCollapsed ? styles.structurePanelCollapsed : styles.structurePanel}`}>
                         <div className="flex items-center justify-between mb-8">
                             <div className="flex items-center gap-2.5">
                                 <Layers className="w-3.5 h-3.5 text-[#C5A880]" />
@@ -980,11 +975,13 @@ export const Dashboard: React.FC = () => {
                     <BlogModule />
                 ) : activePage === "contact" ? (
                     <ContactModule />
+                ) : activePage === "global-settings" ? (
+                    <GlobalSettingsModule />
                 ) : (
                     /* MAIN CONTENT AREA: EDITOR (Priority 60-70% width) */
                     <main
                         ref={mainContentRef}
-                        className={`flex-1 overflow-y-auto p-8 lg:p-12 flex flex-col gap-8 customScrollbar ${styles.editorArea}`}
+                        className={`flex-1 overflow-y-auto overflow-x-hidden p-8 lg:p-12 flex flex-col gap-8 customScrollbar ${styles.editorArea}`}
                     >
                         {/* Top Header Bar */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#C5A880]/10 pb-8">

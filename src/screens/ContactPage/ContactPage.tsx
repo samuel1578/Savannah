@@ -13,6 +13,7 @@ import originMap from "../../assets/map.png";
 import { FooterBrandInviteSection } from "../Homepage/sections/FooterBrandInviteSection";
 import { contactCmsService } from "../../services/contactCmsService";
 import { useContactCms } from "../../hooks/useContactCms";
+import { useGlobalSettings } from "../../hooks/useGlobalSettings";
 
 const experienceTypes = [
   "Private tasting",
@@ -28,6 +29,13 @@ export const ContactPage = (): JSX.Element => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { settings } = useContactCms();
+  const { settings: globalSettings } = useGlobalSettings();
+
+  const getGlobalSetting = (key: string) => globalSettings?.find(s => s.setting_key === key)?.setting_value;
+
+  const address = getGlobalSetting('address_ghana') || 'Savannah Water Studio, Accra, Ghana';
+  const email = getGlobalSetting('company_email') || 'hello@savannahwater.com';
+  const hours = getGlobalSetting('tasting_hours') || 'Tasting Room By Appointment, 11AM - 5 PM';
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -228,24 +236,20 @@ export const ContactPage = (): JSX.Element => {
 
             <div className="mt-10 space-y-7 address-block [font-family:'Raleway',Helvetica] text-sm leading-[1.7] text-[#242514]/75">
               <a
-                href="https://www.google.com/maps/search/?api=1&query=Accra%2C+Ghana"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="block hover:text-[#242514]"
               >
-                Savannah Water Studio
-                <br />
-                Accra, Ghana
+                {address}
                 <br />
                 Available worldwide
               </a>
               <p>
-                Tasting Room By Appointment
-                <br />
-                11AM - 5 PM
+                {hours}
               </p>
-              <a href="mailto:hello@savannahwater.com" className="block hover:text-[#242514]">
-                hello@savannahwater.com
+              <a href={`mailto:${email}`} className="block hover:text-[#242514]">
+                {email}
               </a>
             </div>
           </aside>
@@ -379,12 +383,12 @@ export const ContactPage = (): JSX.Element => {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4 text-center [font-family:'Raleway',Helvetica] text-sm uppercase tracking-[1px] text-[#242514]">
             <MapPin className="map-pin h-10 w-10" style={{ opacity: 0, transform: "scale(0.85)" }} aria-hidden="true" />
-            <span>Accra, Ghana</span>
+            <span>{address}</span>
           </div>
         </div>
       </section>
 
-      <FooterBrandInviteSection />
+      <FooterBrandInviteSection globalSettings={globalSettings} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} activeSection="contact" />
     </main>
   );

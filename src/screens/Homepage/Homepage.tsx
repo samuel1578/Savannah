@@ -15,11 +15,13 @@ import { ReviewsSection } from "./sections/ReviewsSection";
 import { CallToActionSection } from "./sections/CallToActionSection";
 import { FooterBrandInviteSection } from "./sections/FooterBrandInviteSection";
 import { useHomepageCms } from "../../hooks/useHomepageCms";
+import { useGlobalSettings } from "../../hooks/useGlobalSettings";
 
 export const Homepage = (): JSX.Element => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const { homepageSections, products, heritageStories, loading, error } = useHomepageCms();
+  const { settings: globalSettings } = useGlobalSettings();
 
   // Helper to get section data by key
   const getSectionData = useMemo(() => (key: string) => {
@@ -761,7 +763,7 @@ export const Homepage = (): JSX.Element => {
         <CallToActionSection data={getSectionData("cta_section")} />
       </section>
       <section className="w-full">
-        <FooterBrandInviteSection data={getSectionData("footer_invite")} />
+        <FooterBrandInviteSection data={getSectionData("footer_invite")} globalSettings={globalSettings} />
       </section>
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} activeSection={activeSection} />
     </main>
