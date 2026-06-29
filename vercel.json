@@ -5,7 +5,11 @@
             "destination": "https://kxx.dbh.mybluehost.me/api/$1"
         },
         {
-            "source": "/((?!api/|assets/|.*\\..*).*)",
+            "source": "/uploads/(.*)",
+            "destination": "https://kxx.dbh.mybluehost.me/uploads/$1"
+        },
+        {
+            "source": "/((?!api/|uploads/|assets/|.*\\..*).*)",
             "destination": "/index.html"
         }
     ]

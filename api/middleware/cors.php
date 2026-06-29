@@ -6,18 +6,19 @@
 
 $allowed_origins = [
     'http://localhost:5173',
-    'https://savannah-delta.vercel.app'
+    'https://savannah-delta.vercel.app',
+    'https://savannahdrinks.co.uk',
+    'https://www.savannahdrinks.co.uk'
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN'])) {
     if (in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
         header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
         header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Max-Age: 86400"); // Cache preflight for 24 hours
+        header("Access-Control-Max-Age: 86400");
     }
 }
 
-// Handle preflight OPTIONS requests
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
@@ -28,6 +29,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
     }
 
-    // End script for preflight requests
     exit(0);
 }
