@@ -15,11 +15,11 @@ interface BrandStoryHeroSectionProps {
 }
 
 export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSectionProps): JSX.Element => {
-  // Helper to get field value. Falls back for null/undefined AND empty string,
-  // since a CMS field saved as "" should still show the default, not render blank.
+  // Helper to get field value. Only falls back when the field is truly unset
+  // (null/undefined) — an intentionally empty string from the CMS is respected
+  // as-is, since an admin may deliberately clear a field to hide that content.
   const getField = (key: string, fallback: string) => {
-    const value = data?.fields.find(f => f.key === key)?.value;
-    return value && value.trim() !== "" ? value : fallback;
+    return data?.fields.find(f => f.key === key)?.value ?? fallback;
   };
 
   const chapterMarker = data?.chapter_marker ?? "01 — Story";
@@ -171,14 +171,18 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
             </p>
 
             {/* heading-luigi */}
-            <div className="absolute right-[108px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[clamp(40px,3.6vw,70px)] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card hero-inspiration-title">
-              {inspirationTitle}
-            </div>
+            {inspirationTitle && (
+              <div className="absolute right-[108px] top-[856px] w-[377px] [font-family:'Cormorant_Unicase',Helvetica] text-[clamp(40px,3.6vw,70px)] font-medium leading-[0.9] tracking-[-2px] text-[#242514] hero-story-card hero-inspiration-title">
+                {inspirationTitle}
+              </div>
+            )}
 
             {/* Inspiration */}
-            <div className="absolute right-[335px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card hero-inspiration-tag">
-              {inspirationTag}
-            </div>
+            {inspirationTag && (
+              <div className="absolute right-[335px] top-[1009px] w-[150px] font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514] flex items-center whitespace-nowrap hero-story-card hero-inspiration-tag">
+                {inspirationTag}
+              </div>
+            )}
           </div>
 
           {/* Responsive Layout (large screens, tablets, and mobile) */}
@@ -228,12 +232,16 @@ export const BrandStoryHeroSection = ({ data, products = [] }: BrandStoryHeroSec
                   <p className="[font-family:'Raleway',Helvetica] text-sm leading-[25px] text-[#242514] sm:text-base">
                     {inspirationBody}
                   </p>
-                  <div className="[font-family:'Cormorant_Unicase',Helvetica] text-[42px] font-medium leading-[0.9] tracking-[-2px] text-[#242514] sm:text-[54px]">
-                    {inspirationTitle}
-                  </div>
-                  <p className="font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514]">
-                    {inspirationTag}
-                  </p>
+                  {inspirationTitle && (
+                    <div className="[font-family:'Cormorant_Unicase',Helvetica] text-[42px] font-medium leading-[0.9] tracking-[-2px] text-[#242514] sm:text-[54px]">
+                      {inspirationTitle}
+                    </div>
+                  )}
+                  {inspirationTag && (
+                    <p className="font-qi124-qodeinteractive-com-raleway-regular text-[length:var(--qi124-qodeinteractive-com-raleway-regular-font-size)] font-[number:var(--qi124-qodeinteractive-com-raleway-regular-font-weight)] leading-[var(--qi124-qodeinteractive-com-raleway-regular-line-height)] tracking-[var(--qi124-qodeinteractive-com-raleway-regular-letter-spacing)] text-[#242514]">
+                      {inspirationTag}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
