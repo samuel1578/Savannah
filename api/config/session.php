@@ -3,16 +3,28 @@
  * Secure Session Configuration and Management
  */
 
+function get_session_cookie_domain()
+{
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    
+    if (strpos($origin, 'savannahdrinks.co.uk') !== false) {
+        return '.savannahdrinks.co.uk';
+    }
+    
+    // For savannah-delta.vercel.app and localhost — no domain restriction
+    return '';
+}
+
 function start_secure_session()
 {
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
 
-    // Cross-origin support for localhost/Vercel -> Bluehost API
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
+        'domain' => get_session_cookie_domain(),
         'secure' => true,
         'httponly' => true,
         'samesite' => 'None'
@@ -31,7 +43,6 @@ function start_secure_session()
         isset($_SESSION['last_activity']) &&
         (time() - $_SESSION['last_activity']) > $timeout_duration
     ) {
-
         destroy_secure_session();
 
         http_response_code(401);
@@ -75,4 +86,3 @@ function destroy_secure_session()
 
     session_destroy();
 }
-
